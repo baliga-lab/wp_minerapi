@@ -42,7 +42,7 @@ function mutation_table_shortcode($attr, $content=null)
 {
     $mutation_name = get_query_var('mutation');
     $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/mutation/" .
+    $result_json = file_get_contents($source_url . "/mutation/" .
                                      rawurlencode($mutation_name));
     $entries = json_decode($result_json)->entries;
 
@@ -52,7 +52,7 @@ function mutation_table_shortcode($attr, $content=null)
     $content .= "  <thead><tr><th>Regulator</th><th>Role</th><th>Regulon</th><th>Cox Hazard Ratio (Regulon)</th><th>Transcriptional Programs</th></tr></thead>";
     $content .= "  <tbody>";
     foreach ($entries as $idx=>$e) {
-        $prog_json = json_decode(file_get_contents($source_url . "/api/v1.0.0/program/" . $e->trans_program));
+        $prog_json = json_decode(file_get_contents($source_url . "/program/" . $e->trans_program));
         // build gene links
         $ens_genes = array();
         foreach ($prog_json->genes as $g) {
@@ -90,7 +90,7 @@ function regulator_table_shortcode($attr, $content=null)
 {
     $regulator_name = get_query_var('regulator');
     $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/regulator/" .
+    $result_json = file_get_contents($source_url . "/regulator/" .
                                      rawurlencode($regulator_name));
     $result = json_decode($result_json);
     $entries = $result->entries;
@@ -100,7 +100,7 @@ function regulator_table_shortcode($attr, $content=null)
     $content .= "  <thead><tr><th>Mutation</th><th>Regulator</th><th>Role</th><th>Regulon</th><th>Cox Hazard Ratio</th><th>Transcriptional Program</th></tr></thead>";
     $content .= "  <tbody>";
     foreach ($entries as $idx=>$e) {
-        $prog_json = json_decode(file_get_contents($source_url . "/api/v1.0.0/program/" . $e->trans_program));
+        $prog_json = json_decode(file_get_contents($source_url . "/program/" . $e->trans_program));
         // build gene links
         $ens_genes = array();
         foreach ($prog_json->genes as $g) {
@@ -147,7 +147,7 @@ function bicluster_genes_table_shortcode($attr, $content=null)
 {
     $bicluster_name = get_query_var('bicluster');
     $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/bicluster/" .
+    $result_json = file_get_contents($source_url . "/bicluster/" .
                                      rawurlencode($bicluster_name));
     $entries = json_decode($result_json)->genes;
     $content = "<a name=\"genes\"></a>";
@@ -164,7 +164,7 @@ function bicluster_tfs_table_shortcode($attr, $content=null)
 {
     $bicluster_name = get_query_var('bicluster');
     $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/bicluster/" .
+    $result_json = file_get_contents($source_url . "/bicluster/" .
                                      rawurlencode($bicluster_name));
     $entries = json_decode($result_json)->tfs_bc;
     $content = "<a name=\"regulators\"></a>";
@@ -191,7 +191,7 @@ function bicluster_mutation_tfs_table_shortcode($attr, $content=null)
 {
     $bicluster_name = get_query_var('bicluster');
     $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/bicluster/" .
+    $result_json = file_get_contents($source_url . "/bicluster/" .
                                      rawurlencode($bicluster_name));
     $entries = json_decode($result_json)->mutations_tfs;
     $content = "";
@@ -217,7 +217,7 @@ function bicluster_patients_table_shortcode($attr, $content=null)
 {
     $bicluster_name = get_query_var('bicluster');
     $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/bicluster_patients/" .
+    $result_json = file_get_contents($source_url . "/bicluster_patients/" .
                                      rawurlencode($bicluster_name));
     $entries = json_decode($result_json)->data;
     $content .= "<table id=\"bc_patients\" class=\"stripe row-border\">";
@@ -263,7 +263,7 @@ function search_results_shortcode($attr, $content)
 {
     $search_term = $_GET['search_term'];
     $content = "<div>Search Term: " . $search_term . "</div>";
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/search/" .
+    $result_json = file_get_contents($source_url . "/search/" .
                                      rawurlencode($search_term));
     $result = json_decode($result_json);
     if ($result->found == "no") {
@@ -285,7 +285,7 @@ function bicluster_cytoscape_shortcode($attr, $content)
 {
     $bicluster_name = get_query_var('bicluster');
     $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/bicluster_network/" .
+    $result_json = file_get_contents($source_url . "/bicluster_network/" .
                                      rawurlencode($bicluster_name));
     $content = "";
     $content .= "<div id=\"cytoscape\"><h3>Causal Mechanistic Flow Network</h3></div>";
@@ -317,7 +317,7 @@ function gene_biclusters_table_shortcode($attr, $content=null)
 {
     $gene_name = get_query_var('gene');
     $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/biclusters_for_gene/" .
+    $result_json = file_get_contents($source_url . "/biclusters_for_gene/" .
                                      rawurlencode($gene_name));
     $entries = json_decode($result_json)->biclusters;
     $content = "";
@@ -342,7 +342,7 @@ function gene_biclusters_table_shortcode($attr, $content=null)
 function gene_info_table($gene_name)
 {
     $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/gene_info/" .
+    $result_json = file_get_contents($source_url . "/gene_info/" .
                                      rawurlencode($gene_name));
     $gene_info = json_decode($result_json);
     $content = "";
@@ -395,7 +395,7 @@ function gene_uniprot_shortcode($attr, $content=null)
 {
     $gene_name = get_query_var('gene');
     $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/gene_info/" .
+    $result_json = file_get_contents($source_url . "/gene_info/" .
                                      rawurlencode($gene_name));
     $gene_info = json_decode($result_json);
     $content = "";
@@ -419,7 +419,7 @@ function bicluster_summary_shortcode($attr, $content)
 {
     $bicluster_name = get_query_var('bicluster');
     $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/bicluster/" .
+    $result_json = file_get_contents($source_url . "/bicluster/" .
                                      rawurlencode($bicluster_name));
     $result = json_decode($result_json);
     $num_genes = count($result->genes);
@@ -621,7 +621,7 @@ function patient_info_shortcode($attr, $content=null)
 {
     $patient_name = get_query_var('patient');
     $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/patient/" .
+    $result_json = file_get_contents($source_url . "/patient/" .
                                      rawurlencode($patient_name));
     $patient_info = json_decode($result_json);
     $content = "";
@@ -649,7 +649,7 @@ function patient_tf_activity_table_shortcode($attr, $content=null)
 {
     $patient_name = get_query_var('patient');
     $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/patient/" .
+    $result_json = file_get_contents($source_url . "/patient/" .
                                      rawurlencode($patient_name));
     $patient_info = json_decode($result_json);
     $entries = $patient_info->tf_activity;
@@ -682,7 +682,7 @@ function add_causal_flow_table($content, $entries, $tableId) {
     $content .= "  <thead><tr><th>Mutation</th><th>Role</th><th>Regulator</th><th>Role</th><th>Regulon</th><th>Hazard Ratio</th><th># regulon genes</th><th>Transcriptional Program</th></tr></thead>";
     $content .= "  <tbody>";
     foreach ($entries as $idx=>$e) {
-        $prog_json = json_decode(file_get_contents($source_url . "/api/v1.0.0/program/" . $e->trans_program));
+        $prog_json = json_decode(file_get_contents($source_url . "/program/" . $e->trans_program));
         // build gene links
         $ens_genes = array();
         foreach ($prog_json->genes as $g) {
@@ -723,7 +723,7 @@ function add_causal_flow_table($content, $entries, $tableId) {
 function causal_flow_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/causal_flow");
+    $result_json = file_get_contents($source_url . "/causal_flow");
     $entries = json_decode($result_json)->entries;
     $content = "";
     $content = add_causal_flow_table($content, $entries, "causal_flow");
@@ -970,7 +970,7 @@ function mutation_causal_flow_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
     $search_term = get_query_var('search_term');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/cfsearch/" . $search_term);
+    $result_json = file_get_contents($source_url . "/cfsearch/" . $search_term);
     $entries = json_decode($result_json)->by_mutation;
     $content = "";
     $content .= "<h3>Causal Mechanistic Flows regulated by Mutation in <b>" . $search_term . "</b></h3>";
@@ -986,7 +986,7 @@ function regulator_causal_flow_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
     $search_term = get_query_var('search_term');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/cfsearch/" . $search_term);
+    $result_json = file_get_contents($source_url . "/cfsearch/" . $search_term);
     $entries = json_decode($result_json)->by_regulator;
     $content = "";
     $content .= "<h3>Causal Mechanistic Flows with <b>" . $search_term . "</b> as Regulator</h3>";
@@ -1003,7 +1003,7 @@ function reggenes_causal_flow_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
     $search_term = get_query_var('search_term');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/cfsearch/" . $search_term);
+    $result_json = file_get_contents($source_url . "/cfsearch/" . $search_term);
     $entries = json_decode($result_json)->by_reggenes;
     $content = "";
     $content .= "<h3>Causal Mechanistic Flows with regulons containing <b>" . $search_term . "</b></h3>";
@@ -1020,10 +1020,10 @@ function program_causal_flow_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
     $program = get_query_var('program');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/causal_flows_with_program/" . $program);
+    $result_json = file_get_contents($source_url . "/causal_flows_with_program/" . $program);
     $entries = json_decode($result_json)->entries;
     $content = "";
-    $content .= "<h3>Causal Mechanistic Flows with regulons in program Pr-<b>" . $program . "</b></h3>";
+    $content .= "<h3>Causal Mechanistic Flows with regulons in program <b>" . $program . "</b></h3>";
     $content = add_causal_flow_table($content, $entries, "prog_causal_flow");
     return $content;
 }
@@ -1032,10 +1032,10 @@ function program_regulon_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
     $program = get_query_var('program');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/program/" . $program);
+    $result_json = file_get_contents($source_url . "/program/" . $program);
     $regulons = json_decode($result_json)->regulons;
     $content = "";
-    $content .= "<h3>Regulons in program Pr-<b>" . $program . "</b></h3>";
+    $content .= "<h3>Regulons in program <b>" . $program . "</b></h3>";
     $content .= "<table id=\"prog_regulons\" class=\"stripe row-border\">";
     $content .= "  <thead><tr><th>Regulon</th>";
     $content .= "  <th>Cox Hazard Ratio</th>";
@@ -1065,10 +1065,10 @@ function program_gene_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
     $program = get_query_var('program');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/program/" . $program);
+    $result_json = file_get_contents($source_url . "/program/" . $program);
     $genes = json_decode($result_json)->genes;
     $content = "";
-    $content .= "<h3>Genes in program Pr-<b>" . $program . "</b></h3>";
+    $content .= "<h3>Genes in program <b>" . $program . "</b></h3>";
     $content .= "<table id=\"prog_genes\" class=\"stripe row-border\">";
     $content .= "  <thead><tr><th>EnsEMBL Id</th><th>Entrez Id</th><th>Preferred</th></tr></thead>";
     $content .= "  <tbody>";
@@ -1093,7 +1093,7 @@ function program_info_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
     $program = get_query_var('program');
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/program/" . $program);
+    $result_json = file_get_contents($source_url . "/program/" . $program);
     $info = json_decode($result_json);
     $num_genes = $info->num_genes;
     $num_regulons = $info->num_regulons;
@@ -1109,7 +1109,7 @@ function program_info_shortcode($attr, $content=null)
         array_push($regulon_links, "<a href=\"index.php/bicluster/?bicluster=$regulon_id\">$regulon_id</a>");
     }
     $regulons = implode(", ", $regulon_links);
-    $content = "<h3><a href=\"#mutation_table\" data-toggle=\"collapse\" aria-expanded=\"false\" aria-controls=\"help\"><i class=\"fas fa-info-circle pull-right\"> Pr-$program</i> </a></h3>\n";
+    $content = "<h3><a href=\"#mutation_table\" data-toggle=\"collapse\" aria-expanded=\"false\" aria-controls=\"help\"><i class=\"fas fa-info-circle pull-right\"> $program</i> </a></h3>\n";
     $content .= "<div class=\"collapse\" id=\"mutation_table\">\n";
     $content .= "<div class=\"card card-body\">\n";
     $content .= "<div class=\"card-header\">\n";
