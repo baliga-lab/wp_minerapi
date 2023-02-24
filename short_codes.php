@@ -49,9 +49,10 @@ function mutation_table_shortcode($attr, $content=null)
     $content = "";
     $content .= "<h3>Causal Mechanistic Flows for Mutation <i>" . $mutation_name . "</i></h3>";
     $content .= "<table id=\"biclusters\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>Regulator</th><th>Role</th><th>Regulon</th><th>Cox Hazard Ratio (Regulon)</th><th>Transcriptional Programs</th></tr></thead>";
+    $content .= "  <thead><tr><th>Regulator</th><th>Role</th><th>Regulon</th><th>Cox Hazard Ratio (Regulon)</th></tr></thead>";
     $content .= "  <tbody>";
     foreach ($entries as $idx=>$e) {
+        /*
         $prog_json = json_decode(file_get_contents($source_url . "/program/" . $e->trans_program));
         // build gene links
         $ens_genes = array();
@@ -71,8 +72,14 @@ function mutation_table_shortcode($attr, $content=null)
             array_push($regulon_links, "<a href=\"index.php/bicluster/?bicluster=$regulon_id\">$regulon_id</a>");
         }
         $regulons = implode(", ", $regulon_links);
+        */
+        $regulons = "";
+        $genes = "";
+        $num_regulons = 0;
+        $num_genes = 0;
 
-        $content .= "    <tr><td><a href=\"index.php/regulator/?regulator=" . $e->regulator . "\">" . $e->regulator_preferred . "</a></td><td class=\"$e->role\">" . $e->role . "</td><td><a href=\"index.php/bicluster/?bicluster=" . $e->bicluster . "\">" . $e->bicluster . "</a></td><td>$e->bc_cox_hazard_ratio</td><td><a href=\"index.php/program/?program=" . $e->trans_program . "\">Pr-" . $e->trans_program . "</a>  <a href=\"#coll_$idx\" data-toggle=\"collapse\" aria-expanded=\"false\" aria-controls=\"help\"><i class=\"fas fa-info-circle pull-right\"></i></a><div class=\"collapse\" id=\"coll_$idx\"><div class=\"card card-body\"><p class=\"card-text\"><h4>Genes ($num_genes)</h4><p>$genes</p><h4>Regulons ($num_regulons)</h4><p>$regulons</p></td></tr>";
+
+        $content .= "    <tr><td><a href=\"index.php/regulator/?regulator=" . $e->regulator . "\">" . $e->regulator_preferred . "</a></td><td class=\"$e->role\">" . $e->role . "</td><td><a href=\"index.php/bicluster/?bicluster=" . $e->bicluster . "\">" . $e->bicluster . "</a></td><td>$e->bc_cox_hazard_ratio</td></tr>";
     }
     $content .= "  </tbody>";
     $content .= "</table>";
@@ -100,28 +107,28 @@ function regulator_table_shortcode($attr, $content=null)
     $content .= "  <thead><tr><th>Mutation</th><th>Regulator</th><th>Role</th><th>Regulon</th><th>Cox Hazard Ratio</th><th>Transcriptional Program</th></tr></thead>";
     $content .= "  <tbody>";
     foreach ($entries as $idx=>$e) {
-        $prog_json = json_decode(file_get_contents($source_url . "/program/" . $e->trans_program));
+        //$prog_json = json_decode(file_get_contents($source_url . "/program/" . $e->trans_program));
         // build gene links
-        $ens_genes = array();
-        foreach ($prog_json->genes as $g) {
-            $preferred = $g->preferred;
-            if (strlen($preferred) > 0) {
-                array_push($ens_genes, "<a href=\"index.php/gene-biclusters/?gene=$preferred\">$preferred</a>");
-            }
-        }
-        $num_genes = $prog_json->num_genes;
-        $num_regulons = $prog_json->num_regulons;
-        $genes = implode(", ", $ens_genes);
+        //$ens_genes = array();
+        //foreach ($prog_json->genes as $g) {
+        //    $preferred = $g->preferred;
+        //    if (strlen($preferred) > 0) {
+        //        array_push($ens_genes, "<a href=\"index.php/gene-biclusters/?gene=$preferred\">$preferred</a>");
+        //    }
+        //}
+        //$num_genes = $prog_json->num_genes;
+        //$num_regulons = $prog_json->num_regulons;
+        //$genes = implode(", ", $ens_genes);
         // build regulon links
-        $regulon_links = array();
-        foreach ($prog_json->regulons as $r) {
-            $regulon_id = $r->name;
-            array_push($regulon_links, "<a href=\"index.php/bicluster/?bicluster=$regulon_id\">$regulon_id</a>");
-        }
-        $regulons = implode(", ", $regulon_links);
+        //$regulon_links = array();
+        //foreach ($prog_json->regulons as $r) {
+        //    $regulon_id = $r->name;
+        //    array_push($regulon_links, "<a href=\"index.php/bicluster/?bicluster=$regulon_id\">$regulon_id</a>");
+        //}
+        //$regulons = implode(", ", $regulon_links);
 
         $content .= "    <tr><td><a href=\"index.php/mutation/?mutation=" . $e->mutation . "\">" . $e->mutation . "</a></td><td>$result->regulator_preferred</td><td class=\"$e->role\">" . $e->role . "</td><td><a href=\"index.php/bicluster/?bicluster=" . $e->bicluster . "\">" .
-                 $e->bicluster . "</a></td><td>" . $e->hazard_ratio  . "</td><td><a href=\"index.php/program/?program=" . $e->trans_program . "\">Pr-$e->trans_program</a>   <a href=\"#coll_$idx\" data-toggle=\"collapse\" aria-expanded=\"false\" aria-controls=\"help\"><i class=\"fas fa-info-circle pull-right\"></i></a><div class=\"collapse\" id=\"coll_$idx\"><div class=\"card card-body\"><p class=\"card-text\"><h4>Genes ($num_genes)</h4><p>$genes</p><h4>Regulons ($num_regulons)</h4><p>$regulons</p>  </td></tr>";
+                 $e->bicluster . "</a></td><td>" . $e->hazard_ratio  . "</td><td>(No program info)</td></tr>";
     }
     $content .= "  </tbody>";
     $content .= "</table>";
@@ -349,8 +356,19 @@ function gene_info_table($gene_name)
     if ($gene_info->preferred == 'NA') {
         return $content;
     }
+    if ($gene_info->preferred != null) {
+        $preferred_name = $gene_info->preferred;
+    } else {
+        $preferred_name = $gene_name;
+        $gene_info->preferred = '-';
+    }
+    if ($gene_info->entrez_id == null) { $entrez_link = '-'; }
+    else {
+        $entrez_link = "<a href=\"https://www.ncbi.nlm.nih.gov/gene/?term=" . $gene_info->entrez_id . "\" target=\"_blank\">" . $gene_info->entrez_id . "</a>";
+    }
+
     $desc = preg_replace('/\[.*\]/', '', $gene_info->description);
-    $content .= "<h3>" . $gene_info->preferred . " - " . $desc;
+    $content .= "<h3>" . $preferred_name . " - " . $desc;
     $content .= "</h3>";
     $content .= "<a href=\"index.php/gene-uniprot/?gene=" . $gene_name . "\">" . "Uniprot Browser" . "</a>";
     $content .= "<table>";
@@ -359,7 +377,7 @@ function gene_info_table($gene_name)
     $content .= "  </thead>";
     $content .= "  <tbody>";
     $content .= "    <tr>";
-    $content .= "      <td><a href=\"https://www.ncbi.nlm.nih.gov/gene/?term=" . $gene_info->entrez_id . "\" target=\"_blank\">" . $gene_info->entrez_id . "</a></td>";
+    $content .= "      <td>" . $entrez_link . "</td>";
     $content .= "      <td><a href=\"http://www.ensembl.org/id/" . $gene_info->ensembl_id . "\" target=\"_blank\">" . $gene_info->ensembl_id . "</a></td>";
     $content .= "      <td>" . $gene_info->preferred . "</td>";
     $content .= "      <td><a href=\"https://www.uniprot.org/uniprot/" . $gene_info->uniprot_id . "\" target=\"_blank\">" . $gene_info->uniprot_id . "</a></td>";
