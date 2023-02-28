@@ -77,6 +77,7 @@ require_once('ajax_source.php');
  */
 function add_query_vars_filter($vars) {
     $vars[] = "bicluster";
+    $vars[] = "regulon";
     $vars[] = "regulator";
     $vars[] = "mutation";
     $vars[] = "gene";

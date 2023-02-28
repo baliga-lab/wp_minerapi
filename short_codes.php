@@ -126,8 +126,8 @@ function regulator_table_shortcode($attr, $content=null)
         //}
         //$regulons = implode(", ", $regulon_links);
 
-        $content .= "    <tr><td><a href=\"index.php/mutation/?mutation=" . $e->mutation . "\">" . $e->mutation . "</a></td><td>$result->regulator_preferred</td><td class=\"$e->role\">" . $e->role . "</td><td><a href=\"index.php/bicluster/?bicluster=" . $e->bicluster . "\">" .
-                 $e->bicluster . "</a></td><td>" . $e->hazard_ratio  . "</td><td>(No program info)</td></tr>";
+        $content .= "    <tr><td><a href=\"index.php/mutation/?mutation=" . $e->mutation . "\">" . $e->mutation . "</a></td><td>$result->regulator_preferred</td><td class=\"$e->role\">" . $e->role . "</td><td><a href=\"index.php/regulon/?regulon=" . $e->regulon . "\">" .
+                 $e->regulon . "</a></td><td>" . $e->hazard_ratio  . "</td><td>(No program info)</td></tr>";
     }
     $content .= "  </tbody>";
     $content .= "</table>";
@@ -432,17 +432,17 @@ function gene_uniprot_shortcode($attr, $content=null)
     return $content;
 }
 
-function bicluster_summary_shortcode($attr, $content)
+function regulon_summary_shortcode($attr, $content)
 {
-    $bicluster_name = get_query_var('bicluster');
+    $regulon_name = get_query_var('regulon');
     $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/bicluster/" .
-                                     rawurlencode($bicluster_name));
+    $result_json = file_get_contents($source_url . "/regulon/" .
+                                     rawurlencode($regulon_name));
     $result = json_decode($result_json);
     $num_genes = count($result->genes);
     $num_regulators = count($result->tfs_bc);
     $drugs = implode(', ', $result->drugs);
-    $moas = implode(', ', $result->mechanism_of_action);
+    /* $moas = implode(', ', $result->mechanism_of_action);
     $hallmarks = implode(', ', $result->hallmarks);
     if (count($result->target_classes) > 0) {
         $target_class = $result->target_classes[0]->name;
@@ -450,13 +450,13 @@ function bicluster_summary_shortcode($attr, $content)
     } else {
         $target_class = '';
         $target_class_pval = '';
-    }
+    }*/
 
     $content = "";
     $content .= "<table id=\"summary1\" class=\"row-border\" style=\"margin-bottom: 10px\">";
-    $content .= "  <thead><tr><th>Genes</th><th>Cox Hazard Ratio</th><th>Regulators</th><th>Causal Flows</th><th>Transcriptional Program</th><th>Drugs</th><th>Mechanism of Action</th><th>Hallmarks</th><th>Target Class</th></tr></thead>";
+    $content .= "  <thead><tr><th>Genes</th><th>Cox Hazard Ratio</th><th>Regulators</th><th>Causal Flows</th><th>Transcriptional Programs</th><th>Drugs</th></tr></thead>";
     $content .= "  <tbody>";
-    $content .= "    <tr><td><a href=\"#genes\">$num_genes</a></td><td>$result->hazard_ratio</td><td><a href=\"#regulators\">$num_regulators</a></td><td>$result->num_causal_flows</td><td><a href=\"index.php/program/?program=" . $result->trans_program . "\">Pr-$result->trans_program</a></td><td>$drugs</td><td>$moas</td><td>$hallmarks</td><td>$target_class</td></tr>";
+    $content .= "    <tr><td><a href=\"#genes\">$num_genes</a></td><td>$result->hazard_ratio</td><td><a href=\"#regulators\">$num_regulators</a></td><td>$result->num_causal_flows</td><td>(TODO)</td><td>$drugs</td></tr>";
     $content .= "  </tbody>";
     $content .= "</table>";
 
@@ -498,10 +498,10 @@ function bicluster_expressions_graph_shortcode($attr, $content)
     return $content;
 }
 
-function bicluster_name_shortcode($attr, $content)
+function regulon_name_shortcode($attr, $content)
 {
-    $bicluster_name = get_query_var('bicluster');
-    return $bicluster_name;
+    $regulon_name = get_query_var('regulon');
+    return $regulon_name;
 }
 
 function bicluster_enrichment_graph_shortcode($attr, $content)
@@ -705,7 +705,7 @@ function add_causal_flow_table($content, $entries, $tableId) {
         foreach ($prog_json->genes as $g) {
             $preferred = $g->preferred;
             if (strlen($preferred) > 0) {
-                array_push($ens_genes, "<a href=\"index.php/gene-biclusters/?gene=$preferred\">$preferred</a>");
+                array_push($ens_genes, "<a href=\"index.php/gene-regulons/?gene=$preferred\">$preferred</a>");
             }
         }
         $num_genes = $prog_json->num_genes;
@@ -715,14 +715,14 @@ function add_causal_flow_table($content, $entries, $tableId) {
         $regulon_links = array();
         foreach ($prog_json->regulons as $r) {
             $regulon_id = $r->name;
-            array_push($regulon_links, "<a href=\"index.php/bicluster/?bicluster=$regulon_id\">$regulon_id</a>");
+            array_push($regulon_links, "<a href=\"index.php/regulon/?regulon=$regulon_id\">$regulon_id</a>");
         }
         $regulons = implode(", ", $regulon_links);
 
         $content .= "    <tr><td><a href=\"index.php/mutation/?mutation=$e->mutation\">$e->mutation</a></td><td>$e->mutation_role</td>";
-        $content .= "<td><a href=\"index.php/regulator/?regulator=$e->regulator\">$e->regulator_preferred</a></td><td>$e->regulator_role</td><td><a href=\"index.php/bicluster/?bicluster=$e->bicluster\">$e->bicluster</a></td>";
+        $content .= "<td><a href=\"index.php/regulator/?regulator=$e->regulator\">$e->regulator_preferred</a></td><td>$e->regulator_role</td><td><a href=\"index.php/regulon/?regulon=$e->regulon\">$e->regulon</a></td>";
         $content .= "<td>$e->hazard_ratio</td>";
-        $content .= "<td><a href=\"index.php/bicluster/?bicluster=$e->bicluster#genes\">$e->num_genes</a></td>";
+        $content .= "<td><a href=\"index.php/regulon/?regulon=$e->regulon#genes\">$e->num_genes</a></td>";
         $content .= "<td><a href=\"index.php/program/?program=$e->trans_program\">Pr-$e->trans_program</a> <a href=\"#coll_$idx\" data-toggle=\"collapse\" aria-expanded=\"false\" aria-controls=\"help\"><i class=\"fas fa-info-circle pull-right\"></i></a><div class=\"collapse\" id=\"coll_$idx\"><div class=\"card card-body\"><p class=\"card-text\"><h4>Genes ($num_genes)</h4><p>$genes</p><h4>Regulons ($num_regulons)</h4><p>$regulons</p>  </td>";
         $content .= "</tr>";
     }
@@ -818,7 +818,7 @@ function causal_flow_mutation_cytoscape_shortcode($attr, $content)
     $content .= "    });";
     $content .= "    cy.on('tap', '.bicluster', function (e) {";
     $content .= "      var bcName = this.data('name');";
-    $content .= "      window.location.href = 'index.php/bicluster/?bicluster=' + bcName;";
+    $content .= "      window.location.href = 'index.php/regulon/?regulon=' + bcName;";
     $content .= "    });";
     $content .= "    cy.on('tap', '.mutation', function (e) {";
     $content .= "      var mutName = this.data('name');";
@@ -1165,11 +1165,11 @@ function minerapi_add_shortcodes()
     add_shortcode('regulator_info', 'regulator_info_shortcode');
     add_shortcode('gene_uniprot', 'gene_uniprot_shortcode');
     add_shortcode('bicluster_cytoscape', 'bicluster_cytoscape_shortcode');
-    add_shortcode('bicluster_summary', 'bicluster_summary_shortcode');
+    add_shortcode('regulon_summary', 'regulon_summary_shortcode');
     add_shortcode('bicluster_expressions', 'bicluster_expressions_graph_shortcode');
     add_shortcode('bicluster_enrichment', 'bicluster_enrichment_graph_shortcode');
     add_shortcode('bicluster_hallmarks', 'bicluster_hallmarks_shortcode');
-    add_shortcode('bicluster_name', 'bicluster_name_shortcode');
+    add_shortcode('regulon_name', 'regulon_name_shortcode');
     add_shortcode('bc_patient_survhisto', 'bc_patient_survhisto_shortcode');
     add_shortcode('bc_patient_agehisto', 'bc_patient_agehisto_shortcode');
     add_shortcode('bc_patient_pie', 'bc_patient_pie_shortcode');
