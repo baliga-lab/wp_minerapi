@@ -414,23 +414,14 @@ function regulon_summary_shortcode($attr, $content)
                                      rawurlencode($regulon_name));
     $result = json_decode($result_json);
     $num_genes = count($result->genes);
-    $num_regulators = count($result->tfs_bc);
+    $num_regulators = count($result->regulon_regulators);
     $drugs = implode(', ', $result->drugs);
-    /* $moas = implode(', ', $result->mechanism_of_action);
-    $hallmarks = implode(', ', $result->hallmarks);
-    if (count($result->target_classes) > 0) {
-        $target_class = $result->target_classes[0]->name;
-        $target_class_pval = $result->target_classes[0]->pval;
-    } else {
-        $target_class = '';
-        $target_class_pval = '';
-    }*/
 
     $content = "";
     $content .= "<table id=\"summary1\" class=\"row-border\" style=\"margin-bottom: 10px\">";
     $content .= "  <thead><tr><th>Genes</th><th>Cox Hazard Ratio</th><th>Regulators</th><th>Causal Flows</th><th>Transcriptional Programs</th><th>Drugs</th></tr></thead>";
     $content .= "  <tbody>";
-    $content .= "    <tr><td><a href=\"#genes\">$num_genes</a></td><td>$result->hazard_ratio</td><td><a href=\"#regulators\">$num_regulators</a></td><td>$result->num_causal_flows</td><td>(TODO)</td><td>$drugs</td></tr>";
+    $content .= "    <tr><td><a href=\"#genes\">$num_genes</a></td><td>$result->hazard_ratio</td><td><a href=\"#regulators\">$num_regulators</a></td><td>$result->num_causal_flows</td><td><a href=\"index.php/program/?program=" . $result->program . "\">" . $result->program . "</a></td><td>$drugs</td></tr>";
     $content .= "  </tbody>";
     $content .= "</table>";
 
