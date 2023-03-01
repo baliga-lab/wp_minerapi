@@ -149,18 +149,17 @@ function regulator_table_shortcode($attr, $content=null)
  * XREF to Uniprot
  * https://rest.ensembl.org/xrefs/id/ENSG00000181991?content-type=application/json
  */
-function bicluster_genes_table_shortcode($attr, $content=null)
+function regulon_genes_shortcode($attr, $content=null)
 {
-    $bicluster_name = get_query_var('bicluster');
+    $regulon_name = get_query_var('regulon');
     $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/bicluster/" .
-                                     rawurlencode($bicluster_name));
+    $result_json = file_get_contents($source_url . "/regulon/" .
+                                     rawurlencode($regulon_name));
     $entries = json_decode($result_json)->genes;
     $content = "<a name=\"genes\"></a>";
-    //$content .= "<h3>Genes for regulon " . $bicluster_name . "</h3>";
     $content .= "<ul style=\"list-style: none\">";
     foreach ($entries as $e) {
-        $content .= "  <li style=\"display: inline\"><a href=\"index.php/gene-biclusters?gene=" . $e . "\">" . $e . "</a></li>";
+        $content .= "  <li style=\"display: inline\"><a href=\"index.php/gene?gene=" . $e . "\">" . $e . "</a></li>";
     }
     $content .= "</ul>";
     return $content;
@@ -218,31 +217,6 @@ function bicluster_mutation_tfs_table_shortcode($attr, $content=null)
     $content .= "</script>";
     return $content;
 }
-
-function bicluster_patients_table_shortcode($attr, $content=null)
-{
-    $bicluster_name = get_query_var('bicluster');
-    $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/bicluster_patients/" .
-                                     rawurlencode($bicluster_name));
-    $entries = json_decode($result_json)->data;
-    $content .= "<table id=\"bc_patients\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>Patient</th><th>Survival</th><th>Survival Status</th><th>Sex</th><th>Age</th></tr></thead>";
-    $content .= "  <tbody>";
-    foreach ($entries as $e) {
-        $content .= "    <tr><td>$e->name</td><td>$e->survival</td><td>$e->survival_status</td><td>$e->sex</td><td>$e->age</td></tr>";
-    }
-    $content .= "  </tbody>";
-    $content .= "</table>";
-    $content .= "<script>";
-    $content .= "  jQuery(document).ready(function() {";
-    $content .= "    jQuery('#bc_patients').DataTable({";
-    $content .= "    })";
-    $content .= "  });";
-    $content .= "</script>";
-    return $content;
-}
-
 
 function search_box_shortcode($attr, $content)
 {
@@ -1151,8 +1125,7 @@ function minerapi_add_shortcodes()
     add_shortcode('regulator_table', 'regulator_table_shortcode');
 
     // bicluster page short codes
-    add_shortcode('bicluster_genes_table', 'bicluster_genes_table_shortcode');
-    add_shortcode('bicluster_patients_table', 'bicluster_patients_table_shortcode');
+    add_shortcode('regulon_genes', 'regulon_genes_shortcode');
     add_shortcode('bicluster_tfs_table', 'bicluster_tfs_table_shortcode');
     add_shortcode('bicluster_mutation_tfs_table', 'bicluster_mutation_tfs_table_shortcode');
 
