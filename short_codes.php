@@ -192,26 +192,41 @@ function bicluster_tfs_table_shortcode($attr, $content=null)
     return $content;
 }
 
-function bicluster_mutation_tfs_table_shortcode($attr, $content=null)
+function regulon_causalflows_shortcode($attr, $content=null)
 {
-    $bicluster_name = get_query_var('bicluster');
+    $regulon = get_query_var('regulon');
     $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/bicluster/" .
-                                     rawurlencode($bicluster_name));
-    $entries = json_decode($result_json)->mutations_tfs;
+    $result_json = file_get_contents($source_url . "/causalflows_for_regulon/" .
+                                     rawurlencode($regulon));
+    $entries = json_decode($result_json)->cm_flows;
     $content = "";
-    //$content = "<h3>Mutations - Regulators for regulon " . $bicluster_name . "</h3>";
-    $content .= "<table id=\"bc_mutations_tfs\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>Mutation</th><th>Role</th><th>Regulator</th><th>Role</th><th>Regulon</th><th>Hazard Ratio</th></tr></thead>";
+    $content .= "<table id=\"regulator_cmf\" class=\"stripe row-border\">";
+    $content .= "  <thead><tr><th>ID</th><th>Mutation</th><th>Pathway</th><th>Role</th><th>Regulator</th><th>p-value</th><th>Spearman R</th><th>Spearman p-Value</th><th>T-Statistic</th><th>log10 p-stratification</th><th>Fraction edges correctly aligned</th><th>Fraction aligned diffexp edges</th><th># downstream regulons</th><th># diffexp regulons</th></tr></thead>";
     $content .= "  <tbody>";
     foreach ($entries as $e) {
-        $content .= "    <tr><td><a href=\"index.php/mutation/?mutation=" . $e->mutation . "\">" . $e->mutation . "</a></td><td>" . $e->mutation_role . "</td><td><a href=\"index.php/regulator/?regulator=" . $e->tf . "\">" . $e->tf_preferred . "</a></td><td>" . $e->regulator_role . "</td><td>" . $bicluster_name . "</td><td>" . $e->hazard_ratio . "</td></tr>";
+        $content .= "    <tr><td>" . $e->cmf_id .
+		 "</td><td><a href=\"index.php/mutation/?mutation=" .
+		 $e->mutation . "\">" . $e->mutation . "</a></td><td>" .
+		 $e->pathway . "</td><td>" .
+		 $e->mutation_role . "</td><td>" .
+		 "<a href=\"index.php/regulator/?regulator=" . $e->regulator . "\">" .
+		 $e->regulator_preferred . "</a></td><td>" .
+		 $e->regulator_pvalue . "</td><td>" .
+		 $e->regulator_spearman_r . "</td><td>" .
+		 $e->regulator_spearman_pvalue . "</td><td>" .
+		 $e->regulon_t_statistic . "</td><td>" .
+		 $e->regulon_log10_p_stratification . "</td><td>" .
+		 $e->fraction_edges_correctly_aligned . "</td><td>" .
+		 $e->fraction_aligned_diffexp_edges . "</td><td>" .
+		 $e->num_downstream_regulons . "</td><td>" .
+		 $e->num_diffexp_regulons .
+		 "</td></tr>";
     }
     $content .= "  </tbody>";
     $content .= "</table>";
     $content .= "<script>";
     $content .= "  jQuery(document).ready(function() {";
-    $content .= "    jQuery('#bc_mutations_tfs').DataTable({";
+    $content .= "    jQuery('#regulator_cmf').DataTable({";
     $content .= "    })";
     $content .= "  });";
     $content .= "</script>";
@@ -1118,7 +1133,7 @@ function minerapi_add_shortcodes()
     // bicluster page short codes
     add_shortcode('regulon_genes', 'regulon_genes_shortcode');
     add_shortcode('bicluster_tfs_table', 'bicluster_tfs_table_shortcode');
-    add_shortcode('bicluster_mutation_tfs_table', 'bicluster_mutation_tfs_table_shortcode');
+    add_shortcode('regulon_causalflows', 'regulon_causalflows_shortcode');
 
     add_shortcode('minerapi_search_box', 'search_box_shortcode');
     add_shortcode('minerapi_search_results', 'search_results_shortcode');
