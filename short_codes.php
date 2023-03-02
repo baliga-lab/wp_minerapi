@@ -192,15 +192,11 @@ function bicluster_tfs_table_shortcode($attr, $content=null)
     return $content;
 }
 
-function regulon_causalflows_shortcode($attr, $content=null)
+function render_causalflows_table($result_json, $table_id)
 {
-    $regulon = get_query_var('regulon');
-    $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/causalflows_for_regulon/" .
-                                     rawurlencode($regulon));
     $entries = json_decode($result_json)->cm_flows;
     $content = "";
-    $content .= "<table id=\"regulator_cmf\" class=\"stripe row-border\">";
+    $content .= "<table id=\"" . $table_id . "\" class=\"stripe row-border\">";
     $content .= "  <thead><tr><th>ID</th><th>Pathway</th><th>Mutation</th><th>Role</th><th>Regulator</th><th>Role</th><th>Regulon</th><th># downstream regulons</th><th># diffexp regulons</th></tr></thead>";
     $content .= "  <tbody>";
     foreach ($entries as $e) {
@@ -212,7 +208,8 @@ function regulon_causalflows_shortcode($attr, $content=null)
 		 "<a href=\"index.php/regulator/?regulator=" . $e->regulator . "\">" .
 		 $e->regulator_preferred . "</a></td><td>" .
 		 $e->regulator_role . "</td><td>" .
-		 $regulon . "</td><td>" .
+         "<a href=\"index.php/regulon/?regulon=" . $e->regulon . "\">" .
+		 $e->regulon . "</a></td><td>" .
 		 $e->num_downstream_regulons . "</td><td>" .
 		 $e->num_diffexp_regulons .
 		 "</td></tr>";
@@ -221,12 +218,31 @@ function regulon_causalflows_shortcode($attr, $content=null)
     $content .= "</table>";
     $content .= "<script>";
     $content .= "  jQuery(document).ready(function() {";
-    $content .= "    jQuery('#regulator_cmf').DataTable({";
+    $content .= "    jQuery('#" . $table_id . "').DataTable({";
     $content .= "    })";
     $content .= "  });";
     $content .= "</script>";
     return $content;
 }
+
+function regulon_causalflows_shortcode($attr, $content=null)
+{
+    $regulon = get_query_var('regulon');
+    $source_url = get_option('source_url', '');
+    $result_json = file_get_contents($source_url . "/causalflows_for_regulon/" .
+                                     rawurlencode($regulon));
+    return render_causalflows_table($result_json, "regulon_cmf");
+}
+
+function regulator_causalflows_shortcode($attr, $content=null)
+{
+    $regulator = get_query_var('regulator');
+    $source_url = get_option('source_url', '');
+    $result_json = file_get_contents($source_url . "/causalflows_for_regulator/" .
+                                     rawurlencode($regulator));
+    return render_causalflows_table($result_json, "regulator_cmf");
+}
+
 
 function search_box_shortcode($attr, $content)
 {
@@ -974,22 +990,6 @@ function mutation_causal_flow_table_shortcode($attr, $content=null)
     return $content;
 }
 
-function regulator_causal_flow_table_shortcode($attr, $content=null)
-{
-    $source_url = get_option('source_url', '');
-    $search_term = get_query_var('search_term');
-    $result_json = file_get_contents($source_url . "/cfsearch/" . $search_term);
-    $entries = json_decode($result_json)->by_regulator;
-    $content = "";
-    $content .= "<h3>Causal Mechanistic Flows with <b>" . $search_term . "</b> as Regulator</h3>";
-    if (count($entries) == 0) {
-        $content .= "<p>No CM Flow results regulated by a regulator matched your query '$search_term'.</p>";
-    } else {
-        $content = add_causal_flow_table($content, $entries, "reg_causal_flow");
-    }
-    return $content;
-}
-
 
 function reggenes_causal_flow_table_shortcode($attr, $content=null)
 {
@@ -1129,6 +1129,7 @@ function minerapi_add_shortcodes()
     add_shortcode('regulon_genes', 'regulon_genes_shortcode');
     add_shortcode('bicluster_tfs_table', 'bicluster_tfs_table_shortcode');
     add_shortcode('regulon_causalflows', 'regulon_causalflows_shortcode');
+    add_shortcode('regulator_causalflows', 'regulator_causalflows_shortcode');
 
     add_shortcode('minerapi_search_box', 'search_box_shortcode');
     add_shortcode('minerapi_search_results', 'search_results_shortcode');
@@ -1162,7 +1163,6 @@ function minerapi_add_shortcodes()
     add_shortcode('causal_flow_regulator_cytoscape', 'causal_flow_regulator_cytoscape_shortcode');
 
     add_shortcode('mutation_causal_flow_table', 'mutation_causal_flow_table_shortcode');
-    add_shortcode('regulator_causal_flow_table', 'regulator_causal_flow_table_shortcode');
     add_shortcode('reggenes_causal_flow_table', 'reggenes_causal_flow_table_shortcode');
     add_shortcode('program_causal_flow_table', 'program_causal_flow_table_shortcode');
     add_shortcode('program_regulon_table', 'program_regulon_table_shortcode');
