@@ -201,23 +201,18 @@ function regulon_causalflows_shortcode($attr, $content=null)
     $entries = json_decode($result_json)->cm_flows;
     $content = "";
     $content .= "<table id=\"regulator_cmf\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>ID</th><th>Mutation</th><th>Pathway</th><th>Role</th><th>Regulator</th><th>p-value</th><th>Spearman R</th><th>Spearman p-Value</th><th>T-Statistic</th><th>log10 p-stratification</th><th>Fraction edges correctly aligned</th><th>Fraction aligned diffexp edges</th><th># downstream regulons</th><th># diffexp regulons</th></tr></thead>";
+    $content .= "  <thead><tr><th>ID</th><th>Pathway</th><th>Mutation</th><th>Role</th><th>Regulator</th><th>Role</th><th>Regulon</th><th># downstream regulons</th><th># diffexp regulons</th></tr></thead>";
     $content .= "  <tbody>";
     foreach ($entries as $e) {
         $content .= "    <tr><td>" . $e->cmf_id .
+		 "</td><td>" . $e->pathway .
 		 "</td><td><a href=\"index.php/mutation/?mutation=" .
 		 $e->mutation . "\">" . $e->mutation . "</a></td><td>" .
-		 $e->pathway . "</td><td>" .
 		 $e->mutation_role . "</td><td>" .
 		 "<a href=\"index.php/regulator/?regulator=" . $e->regulator . "\">" .
 		 $e->regulator_preferred . "</a></td><td>" .
-		 $e->regulator_pvalue . "</td><td>" .
-		 $e->regulator_spearman_r . "</td><td>" .
-		 $e->regulator_spearman_pvalue . "</td><td>" .
-		 $e->regulon_t_statistic . "</td><td>" .
-		 $e->regulon_log10_p_stratification . "</td><td>" .
-		 $e->fraction_edges_correctly_aligned . "</td><td>" .
-		 $e->fraction_aligned_diffexp_edges . "</td><td>" .
+		 $e->regulator_role . "</td><td>" .
+		 $regulon . "</td><td>" .
 		 $e->num_downstream_regulons . "</td><td>" .
 		 $e->num_diffexp_regulons .
 		 "</td></tr>";
