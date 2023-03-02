@@ -32,7 +32,6 @@ function summary_shortcode($attr, $content=null)
     $content .= "    });";
     $content .= "  });";
     $content .= "</script>";
-    //$content = "<b>Summary2</b>";
     return $content;
 }
 
@@ -91,54 +90,6 @@ function mutation_table_shortcode($attr, $content=null)
     return $content;
 }
 
-
-function regulator_table_shortcode($attr, $content=null)
-{
-    $regulator_name = get_query_var('regulator');
-    $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/regulator/" .
-                                     rawurlencode($regulator_name));
-    $result = json_decode($result_json);
-    $entries = $result->entries;
-    $content = "";
-    $content = "<h3>Causal Mechanistic Flows for Regulator: " . $result->regulator_preferred . "</h3>";
-    $content .= "<table id=\"biclusters\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>Mutation</th><th>Regulator</th><th>Role</th><th>Regulon</th><th>Cox Hazard Ratio</th><th>Transcriptional Program</th></tr></thead>";
-    $content .= "  <tbody>";
-    foreach ($entries as $idx=>$e) {
-        //$prog_json = json_decode(file_get_contents($source_url . "/program/" . $e->trans_program));
-        // build gene links
-        //$ens_genes = array();
-        //foreach ($prog_json->genes as $g) {
-        //    $preferred = $g->preferred;
-        //    if (strlen($preferred) > 0) {
-        //        array_push($ens_genes, "<a href=\"index.php/gene-biclusters/?gene=$preferred\">$preferred</a>");
-        //    }
-        //}
-        //$num_genes = $prog_json->num_genes;
-        //$num_regulons = $prog_json->num_regulons;
-        //$genes = implode(", ", $ens_genes);
-        // build regulon links
-        //$regulon_links = array();
-        //foreach ($prog_json->regulons as $r) {
-        //    $regulon_id = $r->name;
-        //    array_push($regulon_links, "<a href=\"index.php/bicluster/?bicluster=$regulon_id\">$regulon_id</a>");
-        //}
-        //$regulons = implode(", ", $regulon_links);
-
-        $content .= "    <tr><td><a href=\"index.php/mutation/?mutation=" . $e->mutation . "\">" . $e->mutation . "</a></td><td>$result->regulator_preferred</td><td class=\"$e->role\">" . $e->role . "</td><td><a href=\"index.php/regulon/?regulon=" . $e->regulon . "\">" .
-                 $e->regulon . "</a></td><td>" . $e->hazard_ratio  . "</td><td>(No program info)</td></tr>";
-    }
-    $content .= "  </tbody>";
-    $content .= "</table>";
-    $content .= "<script>";
-    $content .= "  jQuery(document).ready(function() {";
-    $content .= "    jQuery('#biclusters').DataTable({";
-    $content .= "    })";
-    $content .= "  });";
-    $content .= "</script>";
-    return $content;
-}
 
 /*
  * TODO: Add information from EnsEMBL and Uniprot
@@ -243,6 +194,14 @@ function regulator_causalflows_shortcode($attr, $content=null)
     return render_causalflows_table($result_json, "regulator_cmf");
 }
 
+function program_causalflows_shortcode($attr, $content=null)
+{
+    $program = get_query_var('program');
+    $source_url = get_option('source_url', '');
+    $result_json = file_get_contents($source_url . "/causalflows_for_program/" .
+                                     rawurlencode($program));
+    return render_causalflows_table($result_json, "program_cmf");
+}
 
 function search_box_shortcode($attr, $content)
 {
@@ -1007,19 +966,6 @@ function reggenes_causal_flow_table_shortcode($attr, $content=null)
     return $content;
 }
 
-
-function program_causal_flow_table_shortcode($attr, $content=null)
-{
-    $source_url = get_option('source_url', '');
-    $program = get_query_var('program');
-    $result_json = file_get_contents($source_url . "/causal_flows_with_program/" . $program);
-    $entries = json_decode($result_json)->entries;
-    $content = "";
-    $content .= "<h3>Causal Mechanistic Flows with regulons in program <b>" . $program . "</b></h3>";
-    $content = add_causal_flow_table($content, $entries, "prog_causal_flow");
-    return $content;
-}
-
 function program_regulon_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
@@ -1097,8 +1043,8 @@ function program_info_shortcode($attr, $content=null)
     $genes = implode(", ", $ens_genes);
     $regulon_links = array();
     foreach ($info->regulons as $r) {
-        $regulon_id = $r->name;
-        array_push($regulon_links, "<a href=\"index.php/bicluster/?bicluster=$regulon_id\">$regulon_id</a>");
+        $regulon = $r->name;
+        array_push($regulon_links, "<a href=\"index.php/regulon/?regulon=$regulon\">$regulon</a>");
     }
     $regulons = implode(", ", $regulon_links);
     $content = "<h3><a href=\"#mutation_table\" data-toggle=\"collapse\" aria-expanded=\"false\" aria-controls=\"help\"><i class=\"fas fa-info-circle pull-right\"> $program</i> </a></h3>\n";
@@ -1123,13 +1069,13 @@ function minerapi_add_shortcodes()
 {
     add_shortcode('summary', 'summary_shortcode');
     add_shortcode('mutation_table', 'mutation_table_shortcode');
-    add_shortcode('regulator_table', 'regulator_table_shortcode');
 
     // bicluster page short codes
     add_shortcode('regulon_genes', 'regulon_genes_shortcode');
     add_shortcode('bicluster_tfs_table', 'bicluster_tfs_table_shortcode');
     add_shortcode('regulon_causalflows', 'regulon_causalflows_shortcode');
     add_shortcode('regulator_causalflows', 'regulator_causalflows_shortcode');
+    add_shortcode('program_causalflows', 'program_causalflows_shortcode');
 
     add_shortcode('minerapi_search_box', 'search_box_shortcode');
     add_shortcode('minerapi_search_results', 'search_results_shortcode');
@@ -1164,7 +1110,6 @@ function minerapi_add_shortcodes()
 
     add_shortcode('mutation_causal_flow_table', 'mutation_causal_flow_table_shortcode');
     add_shortcode('reggenes_causal_flow_table', 'reggenes_causal_flow_table_shortcode');
-    add_shortcode('program_causal_flow_table', 'program_causal_flow_table_shortcode');
     add_shortcode('program_regulon_table', 'program_regulon_table_shortcode');
     add_shortcode('program_gene_table', 'program_gene_table_shortcode');
 
