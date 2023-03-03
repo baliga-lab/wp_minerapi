@@ -35,62 +35,6 @@ function summary_shortcode($attr, $content=null)
     return $content;
 }
 
-
-function mutation_table_shortcode($attr, $content=null)
-{
-    $mutation_name = get_query_var('mutation');
-    $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/mutation/" .
-                                     rawurlencode($mutation_name));
-    $entries = json_decode($result_json)->entries;
-
-    $content = "";
-    $content .= "<h3>Causal Mechanistic Flows for Mutation <i>" . $mutation_name . "</i></h3>";
-    $content .= "<table id=\"biclusters\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>Regulator</th><th>Role</th><th>Regulon</th><th>Cox Hazard Ratio (Regulon)</th></tr></thead>";
-    $content .= "  <tbody>";
-    foreach ($entries as $idx=>$e) {
-        /*
-        $prog_json = json_decode(file_get_contents($source_url . "/program/" . $e->trans_program));
-        // build gene links
-        $ens_genes = array();
-        foreach ($prog_json->genes as $g) {
-            $preferred = $g->preferred;
-            if (strlen($preferred) > 0) {
-                array_push($ens_genes, "<a href=\"index.php/gene-biclusters/?gene=$preferred\">$preferred</a>");
-            }
-        }
-        $num_genes = $prog_json->num_genes;
-        $num_regulons = $prog_json->num_regulons;
-        $genes = implode(", ", $ens_genes);
-        // build regulon links
-        $regulon_links = array();
-        foreach ($prog_json->regulons as $r) {
-            $regulon_id = $r->name;
-            array_push($regulon_links, "<a href=\"index.php/bicluster/?bicluster=$regulon_id\">$regulon_id</a>");
-        }
-        $regulons = implode(", ", $regulon_links);
-        */
-        $regulons = "";
-        $genes = "";
-        $num_regulons = 0;
-        $num_genes = 0;
-
-
-        $content .= "    <tr><td><a href=\"index.php/regulator/?regulator=" . $e->regulator . "\">" . $e->regulator_preferred . "</a></td><td class=\"$e->role\">" . $e->role . "</td><td><a href=\"index.php/bicluster/?bicluster=" . $e->bicluster . "\">" . $e->bicluster . "</a></td><td>$e->bc_cox_hazard_ratio</td></tr>";
-    }
-    $content .= "  </tbody>";
-    $content .= "</table>";
-    $content .= "<script>";
-    $content .= "  jQuery(document).ready(function() {";
-    $content .= "    jQuery('#biclusters').DataTable({";
-    $content .= "    })";
-    $content .= "  });";
-    $content .= "</script>";
-    return $content;
-}
-
-
 /*
  * TODO: Add information from EnsEMBL and Uniprot
  *
@@ -116,6 +60,7 @@ function regulon_genes_shortcode($attr, $content=null)
     return $content;
 }
 
+/*
 function bicluster_tfs_table_shortcode($attr, $content=null)
 {
     $bicluster_name = get_query_var('bicluster');
@@ -142,6 +87,7 @@ function bicluster_tfs_table_shortcode($attr, $content=null)
     $content .= "</script>";
     return $content;
 }
+*/
 
 function render_causalflows_table($result_json, $table_id)
 {
@@ -203,6 +149,15 @@ function program_causalflows_shortcode($attr, $content=null)
     $result_json = file_get_contents($source_url . "/causalflows_for_program/" .
                                      rawurlencode($program));
     return render_causalflows_table($result_json, "program_cmf");
+}
+
+function mutation_causalflows_shortcode($attr, $content=null)
+{
+    $mutation = get_query_var('mutation');
+    $source_url = get_option('source_url', '');
+    $result_json = file_get_contents($source_url . "/causalflows_for_mutation/" .
+                                     rawurlencode($mutation));
+    return render_causalflows_table($result_json, "mutation_cmf");
 }
 
 function search_box_shortcode($attr, $content)
@@ -816,29 +771,37 @@ function program_info_shortcode($attr, $content=null)
 function minerapi_add_shortcodes()
 {
     add_shortcode('summary', 'summary_shortcode');
-    add_shortcode('mutation_table', 'mutation_table_shortcode');
 
-    // bicluster page short codes
+    // Regulon short codes
     add_shortcode('regulon_genes', 'regulon_genes_shortcode');
-    add_shortcode('bicluster_tfs_table', 'bicluster_tfs_table_shortcode');
     add_shortcode('regulon_causalflows', 'regulon_causalflows_shortcode');
     add_shortcode('regulator_causalflows', 'regulator_causalflows_shortcode');
     add_shortcode('program_causalflows', 'program_causalflows_shortcode');
+    add_shortcode('mutation_causalflows', 'mutation_causalflows_shortcode');
+    add_shortcode('regulon_name', 'regulon_name_shortcode');
+    add_shortcode('regulon_summary', 'regulon_summary_shortcode');
+    add_shortcode('regulator_info', 'regulator_info_shortcode');
 
+    # Program related short codes
+    add_shortcode('program_regulon_table', 'program_regulon_table_shortcode');
+    add_shortcode('program_gene_table', 'program_gene_table_shortcode');
+    add_shortcode('program_info', 'program_info_shortcode');
+
+
+    // OLD short codes
+    /*
+    add_shortcode('bicluster_tfs_table', 'bicluster_tfs_table_shortcode');
     add_shortcode('minerapi_search_box', 'search_box_shortcode');
     add_shortcode('minerapi_search_results', 'search_results_shortcode');
     add_shortcode('minerapi_no_search_results', 'no_search_results_shortcode');
 
     add_shortcode('gene_biclusters_table', 'gene_biclusters_table_shortcode');
     add_shortcode('gene_info', 'gene_info_shortcode');
-    add_shortcode('regulator_info', 'regulator_info_shortcode');
     add_shortcode('gene_uniprot', 'gene_uniprot_shortcode');
     add_shortcode('bicluster_cytoscape', 'bicluster_cytoscape_shortcode');
-    add_shortcode('regulon_summary', 'regulon_summary_shortcode');
     add_shortcode('bicluster_expressions', 'bicluster_expressions_graph_shortcode');
     add_shortcode('bicluster_enrichment', 'bicluster_enrichment_graph_shortcode');
     add_shortcode('bicluster_hallmarks', 'bicluster_hallmarks_shortcode');
-    add_shortcode('regulon_name', 'regulon_name_shortcode');
 
     add_shortcode('regulator_survival_plot', 'regulator_survival_plot_shortcode');
     add_shortcode('bicluster_survival_plot', 'bicluster_survival_plot_shortcode');
@@ -849,12 +812,7 @@ function minerapi_add_shortcodes()
     add_shortcode('causal_flow_cytoscape', 'causal_flow_cytoscape_shortcode');
     add_shortcode('causal_flow_mutation_cytoscape', 'causal_flow_mutation_cytoscape_shortcode');
     add_shortcode('causal_flow_regulator_cytoscape', 'causal_flow_regulator_cytoscape_shortcode');
-
-    add_shortcode('program_regulon_table', 'program_regulon_table_shortcode');
-    add_shortcode('program_gene_table', 'program_gene_table_shortcode');
-
-    add_shortcode('program_info', 'program_info_shortcode');
-
+    */
 }
 
 ?>
