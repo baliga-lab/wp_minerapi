@@ -595,7 +595,7 @@ function causal_flow_mutation_cytoscape_shortcode($attr, $content)
     return $content;
 }
 
-function causal_flow_regulator_cytoscape_shortcode($attr, $content)
+function causalflow_regulator_cytoscape_shortcode($attr, $content)
 {
     $regulator_name = get_query_var('regulator');
     $static_url = get_option('static_url', '');
@@ -712,7 +712,7 @@ function program_info_shortcode($attr, $content=null)
         if ($g->preferred) $preferred = $g->preferred;
         else if ($g->ensembl_id) $preferred = $g->ensembl_id;
         else $preferred = $g->entrez_id;
-        array_push($ens_genes, "<a href=\"index.php/gene-biclusters/?gene=$preferred\">$preferred</a>");
+        array_push($ens_genes, "<a href=\"index.php/gene/?gene=$preferred\">$preferred</a>");
     }
     $genes = implode(", ", $ens_genes);
     $regulon_links = array();
@@ -765,6 +765,9 @@ function minerapi_add_shortcodes()
     // Search related short codes
     add_shortcode('minerapi_search_box', 'search_box_shortcode');
 
+    // Cytoscape related short codes
+    add_shortcode('causalflow_regulator_cytoscape', 'causalflow_regulator_cytoscape_shortcode');
+
     // OLD short codes
     /*
     add_shortcode('bicluster_tfs_table', 'bicluster_tfs_table_shortcode');
@@ -782,7 +785,6 @@ function minerapi_add_shortcodes()
     add_shortcode('causal_flow_table', 'causal_flow_table_shortcode');
     add_shortcode('causal_flow_cytoscape', 'causal_flow_cytoscape_shortcode');
     add_shortcode('causal_flow_mutation_cytoscape', 'causal_flow_mutation_cytoscape_shortcode');
-    add_shortcode('causal_flow_regulator_cytoscape', 'causal_flow_regulator_cytoscape_shortcode');
     */
 }
 
