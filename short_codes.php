@@ -181,28 +181,6 @@ function search_box_shortcode($attr, $content)
     return $content;
 }
 
-function search_results_shortcode($attr, $content)
-{
-    $search_term = $_GET['search_term'];
-    $content = "<div>Search Term: " . $search_term . "</div>";
-    $result_json = file_get_contents($source_url . "/search/" .
-                                     rawurlencode($search_term));
-    $result = json_decode($result_json);
-    if ($result->found == "no") {
-        $content .= "<div>no entries found</div>";
-    } else {
-        $content .= "<div>yes, entries found, type: " . $result->data_type .  "</div>";
-    }
-    return $content;
-}
-
-function no_search_results_shortcode($attr, $content)
-{
-    $search_term = $_GET['search_term'];
-    $content .= "<p>The search term '$search_term' did not yield any results.</p>";
-    return $content;
-}
-
 function bicluster_cytoscape_shortcode($attr, $content)
 {
     $bicluster_name = get_query_var('bicluster');
@@ -782,6 +760,7 @@ function minerapi_add_shortcodes()
 
     // Gene related short codes
     add_shortcode('gene_info', 'gene_info_shortcode');
+    add_shortcode('gene_uniprot', 'gene_uniprot_shortcode');
 
     // Search related short codes
     add_shortcode('minerapi_search_box', 'search_box_shortcode');
@@ -789,11 +768,7 @@ function minerapi_add_shortcodes()
     // OLD short codes
     /*
     add_shortcode('bicluster_tfs_table', 'bicluster_tfs_table_shortcode');
-    add_shortcode('minerapi_search_results', 'search_results_shortcode');
-    add_shortcode('minerapi_no_search_results', 'no_search_results_shortcode');
-
     add_shortcode('gene_biclusters_table', 'gene_biclusters_table_shortcode');
-    add_shortcode('gene_uniprot', 'gene_uniprot_shortcode');
     add_shortcode('bicluster_cytoscape', 'bicluster_cytoscape_shortcode');
     add_shortcode('bicluster_expressions', 'bicluster_expressions_graph_shortcode');
     add_shortcode('bicluster_enrichment', 'bicluster_enrichment_graph_shortcode');
