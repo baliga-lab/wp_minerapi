@@ -301,15 +301,6 @@ function gene_info_table($gene_name)
     $content .= "    </tr>";
     $content .= "  </tbody>";
     $content .= "</table>";
-    /*
-    $content .= "<div><span class=\"entry-title\">Entrez ID: </span><span><a href=\"https://www.ncbi.nlm.nih.gov/gene/?term=" . $gene_info->entrez_id . "\" target=\"_blank\">" . $gene_info->entrez_id . "</a></span></div>";
-    $content .= "<div><span class=\"entry-title\">Ensembl ID: </span><span><a href=\"http://www.ensembl.org/id/" . $gene_info->ensembl_id . "\" target=\"_blank\">" . $gene_info->ensembl_id . "</a></span></div>";
-    $content .= "<div><span class=\"entry-title\">Preferred Name: </span><span>" . $gene_info->preferred . "</span></div>";
-
-
-    $content .= "<div><span class=\"entry-title\">UniProt ID: </span><span><a href=\"https://www.uniprot.org/uniprot/" . $gene_info->uniprot_id . "\" target=\"_blank\">" . $gene_info->uniprot_id . "</a></span></div>";
-    $content .= "<div><span class=\"entry-title\">Function: </span><span>" . $gene_info->function . "</span></div>";
-    */
     $content .= "";
     return $content;
 }
@@ -740,7 +731,9 @@ function program_info_shortcode($attr, $content=null)
     $num_regulons = $info->num_regulons;
     $ens_genes = array();
     foreach ($info->genes as $g) {
-        $preferred = $g->preferred;
+        if ($g->preferred) $preferred = $g->preferred;
+        else if ($g->ensembl_id) $preferred = $g->ensembl_id;
+        else $preferred = $g->entrez_id;
         array_push($ens_genes, "<a href=\"index.php/gene-biclusters/?gene=$preferred\">$preferred</a>");
     }
     $genes = implode(", ", $ens_genes);
@@ -782,10 +775,13 @@ function minerapi_add_shortcodes()
     add_shortcode('regulon_summary', 'regulon_summary_shortcode');
     add_shortcode('regulator_info', 'regulator_info_shortcode');
 
-    # Program related short codes
+    // Program related short codes
     add_shortcode('program_regulon_table', 'program_regulon_table_shortcode');
     add_shortcode('program_gene_table', 'program_gene_table_shortcode');
     add_shortcode('program_info', 'program_info_shortcode');
+
+    // Gene related short codes
+    add_shortcode('gene_info', 'gene_info_shortcode');
 
 
     // OLD short codes
@@ -796,7 +792,6 @@ function minerapi_add_shortcodes()
     add_shortcode('minerapi_no_search_results', 'no_search_results_shortcode');
 
     add_shortcode('gene_biclusters_table', 'gene_biclusters_table_shortcode');
-    add_shortcode('gene_info', 'gene_info_shortcode');
     add_shortcode('gene_uniprot', 'gene_uniprot_shortcode');
     add_shortcode('bicluster_cytoscape', 'bicluster_cytoscape_shortcode');
     add_shortcode('bicluster_expressions', 'bicluster_expressions_graph_shortcode');
