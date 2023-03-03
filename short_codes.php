@@ -585,120 +585,6 @@ function program_survival_plot_shortcode($attr, $content=null)
     }
 }
 
-
-function patient_info_shortcode($attr, $content=null)
-{
-    $patient_name = get_query_var('patient');
-    $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/patient/" .
-                                     rawurlencode($patient_name));
-    $patient_info = json_decode($result_json);
-    $content = "";
-    $content .= "<table id=\"summary\" class=\"row-border\" style=\"margin-bottom: 10px\">";
-    $content .= "  <thead><tr><th>Progression-free Survival</th><th>Survival Status</th><th>Sex</th><th>Age</th></tr></thead>";
-    $content .= "  <tbody>";
-    $content .= "    <tr><td>$patient_info->pfs_survival</td><td>$patient_info->pfs_status</td><td>$patient_info->sex</td><td>$patient_info->age</td></tr>";
-    $content .= "  </tbody>";
-    $content .= "</table>";
-    $content .= "<script>";
-    $content .= "  jQuery(document).ready(function() {";
-
-    $content .= "    jQuery('#summary').DataTable({";
-    $content .= "      'paging': false,";
-    $content .= "      'info': false,";
-    $content .= "      'searching': false";
-    $content .= "    });";
-    $content .= "  });";
-    $content .= "</script>";
-
-    return $content;
-}
-
-function patient_tf_activity_table_shortcode($attr, $content=null)
-{
-    $patient_name = get_query_var('patient');
-    $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/patient/" .
-                                     rawurlencode($patient_name));
-    $patient_info = json_decode($result_json);
-    $entries = $patient_info->tf_activity;
-    $content = "";
-    $content = "<h3>Regulator Activity for Patient " . $patient_name . "</h3>";
-    $content .= "<table id=\"tf_activity\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>Regulator</th><th>Activity</th></tr></thead>";
-    $content .= "  <tbody>";
-    foreach ($entries as $e) {
-        $content .= "    <tr><td><a href=\"index.php/regulator/?regulator=" . $e->tf . "\">" . $e->tf . "</a></td><td>$e->activity</td></tr>";
-    }
-    $content .= "  </tbody>";
-    $content .= "</table>";
-    $content .= "<script>";
-    $content .= "  jQuery(document).ready(function() {";
-    $content .= "    jQuery('#tf_activity').DataTable({";
-    $content .= "    })";
-    $content .= "  });";
-    $content .= "</script>";
-    return $content;
-}
-
-/*
- * Generic code to generate causal flow table
- */
-function add_causal_flow_table($content, $entries, $tableId) {
-    $source_url = get_option('source_url', '');
-
-    $content .= "<table id=\"$tableId\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>Mutation</th><th>Role</th><th>Regulator</th><th>Role</th><th>Regulon</th><th>Hazard Ratio</th><th># regulon genes</th><th>Transcriptional Program</th></tr></thead>";
-    $content .= "  <tbody>";
-    foreach ($entries as $idx=>$e) {
-        $prog_json = json_decode(file_get_contents($source_url . "/program/" . $e->trans_program));
-        // build gene links
-        $ens_genes = array();
-        foreach ($prog_json->genes as $g) {
-            $preferred = $g->preferred;
-            if (strlen($preferred) > 0) {
-                array_push($ens_genes, "<a href=\"index.php/gene-regulons/?gene=$preferred\">$preferred</a>");
-            }
-        }
-        $num_genes = $prog_json->num_genes;
-        $num_regulons = $prog_json->num_regulons;
-        $genes = implode(", ", $ens_genes);
-        // build regulon links
-        $regulon_links = array();
-        foreach ($prog_json->regulons as $r) {
-            $regulon_id = $r->name;
-            array_push($regulon_links, "<a href=\"index.php/regulon/?regulon=$regulon_id\">$regulon_id</a>");
-        }
-        $regulons = implode(", ", $regulon_links);
-
-        $content .= "    <tr><td><a href=\"index.php/mutation/?mutation=$e->mutation\">$e->mutation</a></td><td>$e->mutation_role</td>";
-        $content .= "<td><a href=\"index.php/regulator/?regulator=$e->regulator\">$e->regulator_preferred</a></td><td>$e->regulator_role</td><td><a href=\"index.php/regulon/?regulon=$e->regulon\">$e->regulon</a></td>";
-        $content .= "<td>$e->hazard_ratio</td>";
-        $content .= "<td><a href=\"index.php/regulon/?regulon=$e->regulon#genes\">$e->num_genes</a></td>";
-        $content .= "<td><a href=\"index.php/program/?program=$e->trans_program\">Pr-$e->trans_program</a> <a href=\"#coll_$idx\" data-toggle=\"collapse\" aria-expanded=\"false\" aria-controls=\"help\"><i class=\"fas fa-info-circle pull-right\"></i></a><div class=\"collapse\" id=\"coll_$idx\"><div class=\"card card-body\"><p class=\"card-text\"><h4>Genes ($num_genes)</h4><p>$genes</p><h4>Regulons ($num_regulons)</h4><p>$regulons</p>  </td>";
-        $content .= "</tr>";
-    }
-    $content .= "  </tbody>";
-    $content .= "</table>";
-    $content .= "<script>";
-    $content .= "  jQuery(document).ready(function() {";
-    $content .= "    jQuery('#" . $tableId . "').DataTable({";
-    $content .= "    })";
-    $content .= "  });";
-    $content .= "</script>";
-    return $content;
-}
-
-function causal_flow_table_shortcode($attr, $content=null)
-{
-    $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/causal_flow");
-    $entries = json_decode($result_json)->entries;
-    $content = "";
-    $content = add_causal_flow_table($content, $entries, "causal_flow");
-    return $content;
-}
-
 function causal_flow_cytoscape_shortcode($attr, $content)
 {
     $static_url = get_option('static_url', '');
@@ -828,146 +714,6 @@ function causal_flow_regulator_cytoscape_shortcode($attr, $content)
     return $content;
 }
 
-function bc_patient_survhisto_shortcode($attr, $content)
-{
-    $bicluster_name = get_query_var('bicluster');
-
-    $source_url = get_option('source_url', '');
-    $content .= '<div id="patient_survhisto" style="width: 100%; height: 300px"></div>';
-    $content .= "<script>\n";
-    $content .= "    function makePatientSurvHistoChart(data) {";
-    $content .= "      var x, chart = Highcharts.chart('patient_survhisto', {\n";
-    $content .= "        title: { text: 'Patient Survival' },\n";
-    $content .= "        xAxis: [{ title: { text: 'Data' }, alignTicks: false }, { title: { text: 'Histogram' }, alignTicks: false, opposite: true }],";
-    $content .= "       yAxis: [{ title: { text: 'Data' } }, { title: { text: 'Histogram' }, opposite: true }],";
-    $content .= "        series: [{type: 'histogram', xAxis: 1, yAxis: 1, baseSeries: 's1'}, {id: 's1', type: 'scatter', data: data.data, marker: {radius: 1.5}}]\n";
-    $content .= "     })\n";
-    $content .= "   }\n";
-
-    $content .= "  function loadPatientSurvivalHistogram() {\n";
-    $content .= "    jQuery.ajax({\n";
-    $content .= "      url: ajax_dt.ajax_url,\n";
-    $content .= "      method: 'GET',\n";
-    $content .= "      data: {'action': 'bicluster_survival_dt', 'bicluster': '" . $bicluster_name . "' }\n";
-    $content .= "    }).done(function(data) {\n";
-    $content .= "      makePatientSurvHistoChart(data);\n";
-    $content .= "    });\n";
-    $content .= "  };\n";
-    $content .= "  jQuery(document).ready(function() {\n";
-    $content .= "    loadPatientSurvivalHistogram();\n";
-    $content .= "  });\n";
-    $content .= "</script>\n";
-    return $content;
-}
-
-function bc_patient_agehisto_shortcode($attr, $content)
-{
-    $bicluster_name = get_query_var('bicluster');
-
-    $source_url = get_option('source_url', '');
-    $content .= '<div id="patient_agehisto" style="width: 100%; height: 300px"></div>';
-    $content .= "<script>\n";
-    $content .= "    function makePatientAgeHistoChart(data) {";
-    $content .= "      var chart = Highcharts.chart('patient_agehisto', {\n";
-    $content .= "        title: { text: 'Patient Age' },\n";
-    $content .= "        xAxis: [{ title: { text: 'Data' }, alignTicks: false }, { title: { text: 'Histogram' }, alignTicks: false, opposite: true }],";
-    $content .= "       yAxis: [{ title: { text: 'Data' } }, { title: { text: 'Histogram' }, opposite: true }],";
-    $content .= "        series: [{type: 'histogram', xAxis: 1, yAxis: 1, baseSeries: 's1'}, {id: 's1', type: 'scatter', data: data.data, marker: {radius: 1.5}}]\n";
-    $content .= "     })\n";
-    $content .= "   }\n";
-
-    $content .= "  function loadPatientAgeHistogram() {\n";
-    $content .= "    jQuery.ajax({\n";
-    $content .= "      url: ajax_dt.ajax_url,\n";
-    $content .= "      method: 'GET',\n";
-    $content .= "      data: {'action': 'bicluster_ages_dt', 'bicluster': '" . $bicluster_name . "' }\n";
-    $content .= "    }).done(function(data) {\n";
-    $content .= "      makePatientAgeHistoChart(data);\n";
-    $content .= "    });\n";
-    $content .= "  };\n";
-    $content .= "  jQuery(document).ready(function() {\n";
-    $content .= "    loadPatientAgeHistogram();\n";
-    $content .= "  });\n";
-    $content .= "</script>\n";
-    return $content;
-}
-
-function bc_patient_pie_shortcode($attr, $content)
-{
-    $bicluster_name = get_query_var('bicluster');
-
-    $source_url = get_option('source_url', '');
-    $content .= '<div><div id="patient_agepie" style="width: 30%; display: inline-block"></div><div id="patient_sexpie" style="width: 30%; display: inline-block"></div><div id="patient_survpie" style="width: 30%; display: inline-block"></div></div>';
-    $content .= "<script>\n";
-    $content .= "    function makePatientPieCharts(data) {";
-    $content .= "      var chart1 = Highcharts.chart('patient_agepie', {\n";
-    $content .= "        chart: { type: 'pie' },";
-    $content .= "        title: { text: 'Patient Age' },\n";
-    $content .= "        series: [{name: 'Ages', data: data.data.age}]\n";
-    $content .= "     })\n";
-    $content .= "      var chart2 = Highcharts.chart('patient_sexpie', {\n";
-    $content .= "        chart: { type: 'pie' },";
-    $content .= "        title: { text: 'Patient Sex' },\n";
-    $content .= "        series: [{name: 'Sex', data: data.data.sex}]\n";
-    $content .= "     })\n";
-    $content .= "      var chart3 = Highcharts.chart('patient_survpie', {\n";
-    $content .= "        chart: { type: 'pie' },";
-    $content .= "        title: { text: 'Patient Survival' },\n";
-    $content .= "        series: [{name: 'Survival', data: data.data.survival}]\n";
-    $content .= "     })\n";
-    $content .= "   }\n";
-
-    $content .= "  function loadPatientPie() {\n";
-    $content .= "    jQuery.ajax({\n";
-    $content .= "      url: ajax_dt.ajax_url,\n";
-    $content .= "      method: 'GET',\n";
-    $content .= "      data: {'action': 'bicluster_patientstatus_dt', 'bicluster': '" . $bicluster_name . "' }\n";
-    $content .= "    }).done(function(data) {\n";
-    $content .= "       ";
-    $content .= "      makePatientPieCharts(data);\n";
-    $content .= "    });\n";
-    $content .= "  };\n";
-    $content .= "  jQuery(document).ready(function() {\n";
-    $content .= "    loadPatientPie();\n";
-    $content .= "  });\n";
-    $content .= "</script>\n";
-    return $content;
-}
-
-
-function mutation_causal_flow_table_shortcode($attr, $content=null)
-{
-    $source_url = get_option('source_url', '');
-    $search_term = get_query_var('search_term');
-    $result_json = file_get_contents($source_url . "/cfsearch/" . $search_term);
-    $entries = json_decode($result_json)->by_mutation;
-    $content = "";
-    $content .= "<h3>Causal Mechanistic Flows regulated by Mutation in <b>" . $search_term . "</b></h3>";
-    if (count($entries) == 0) {
-        $content .= "<p>No CM Flow results regulated by a mutation matched your query '$search_term'.</p>";
-    } else {
-        $content = add_causal_flow_table($content, $entries, "mut_causal_flow");
-    }
-    return $content;
-}
-
-
-function reggenes_causal_flow_table_shortcode($attr, $content=null)
-{
-    $source_url = get_option('source_url', '');
-    $search_term = get_query_var('search_term');
-    $result_json = file_get_contents($source_url . "/cfsearch/" . $search_term);
-    $entries = json_decode($result_json)->by_reggenes;
-    $content = "";
-    $content .= "<h3>Causal Mechanistic Flows with regulons containing <b>" . $search_term . "</b></h3>";
-    if (count($entries) == 0) {
-        $content .= "<p>No CM Flow results contains genes matching your query '$search_term'.</p>";
-    } else {
-        $content = add_causal_flow_table($content, $entries, "rgg_causal_flow");
-    }
-    return $content;
-}
-
 function program_regulon_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
@@ -1093,25 +839,17 @@ function minerapi_add_shortcodes()
     add_shortcode('bicluster_enrichment', 'bicluster_enrichment_graph_shortcode');
     add_shortcode('bicluster_hallmarks', 'bicluster_hallmarks_shortcode');
     add_shortcode('regulon_name', 'regulon_name_shortcode');
-    add_shortcode('bc_patient_survhisto', 'bc_patient_survhisto_shortcode');
-    add_shortcode('bc_patient_agehisto', 'bc_patient_agehisto_shortcode');
-    add_shortcode('bc_patient_pie', 'bc_patient_pie_shortcode');
 
     add_shortcode('regulator_survival_plot', 'regulator_survival_plot_shortcode');
     add_shortcode('bicluster_survival_plot', 'bicluster_survival_plot_shortcode');
     add_shortcode('mutation_survival_plot', 'mutation_survival_plot_shortcode');
     add_shortcode('program_survival_plot', 'program_survival_plot_shortcode');
 
-    add_shortcode('patient_info', 'patient_info_shortcode');
-    add_shortcode('patient_tf_activity_table', 'patient_tf_activity_table_shortcode');
-
     add_shortcode('causal_flow_table', 'causal_flow_table_shortcode');
     add_shortcode('causal_flow_cytoscape', 'causal_flow_cytoscape_shortcode');
     add_shortcode('causal_flow_mutation_cytoscape', 'causal_flow_mutation_cytoscape_shortcode');
     add_shortcode('causal_flow_regulator_cytoscape', 'causal_flow_regulator_cytoscape_shortcode');
 
-    add_shortcode('mutation_causal_flow_table', 'mutation_causal_flow_table_shortcode');
-    add_shortcode('reggenes_causal_flow_table', 'reggenes_causal_flow_table_shortcode');
     add_shortcode('program_regulon_table', 'program_regulon_table_shortcode');
     add_shortcode('program_gene_table', 'program_gene_table_shortcode');
 
