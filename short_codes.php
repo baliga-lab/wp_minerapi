@@ -148,13 +148,15 @@ function render_causalflows_table($result_json, $table_id)
     $entries = json_decode($result_json)->cm_flows;
     $content = "";
     $content .= "<table id=\"" . $table_id . "\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>ID</th><th>Pathway</th><th>Mutation</th><th>Role</th><th>Regulator</th><th>Role</th><th>Regulon</th><th># downstream regulons</th><th># diffexp regulons</th></tr></thead>";
+    $content .= "  <thead><tr><th>ID</th><th>Mutation</th><th>Role</th><th>Regulator</th><th>Role</th><th>Regulon</th><th># downstream regulons</th><th># diffexp regulons</th></tr></thead>";
     $content .= "  <tbody>";
     foreach ($entries as $e) {
+        $mutgen = $e->mutation_gene_symbol ? $e->mutation_gene_symbol : $e->mutation_gene_ensembl;
+        $mutation = ($e->pathway) ? $e->pathway : $mutgen;
+
         $content .= "    <tr><td>" . $e->cmf_id .
-		 "</td><td>" . $e->pathway .
 		 "</td><td><a href=\"index.php/mutation/?mutation=" .
-		 $e->mutation . "\">" . $e->mutation . "</a></td><td>" .
+		 $e->mutation . "\">" . $mutation . "</a></td><td>" .
 		 $e->mutation_role . "</td><td>" .
 		 "<a href=\"index.php/regulator/?regulator=" . $e->regulator . "\">" .
 		 $e->regulator_preferred . "</a></td><td>" .
