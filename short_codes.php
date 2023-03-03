@@ -783,11 +783,12 @@ function minerapi_add_shortcodes()
     // Gene related short codes
     add_shortcode('gene_info', 'gene_info_shortcode');
 
+    // Search related short codes
+    add_shortcode('minerapi_search_box', 'search_box_shortcode');
 
     // OLD short codes
     /*
     add_shortcode('bicluster_tfs_table', 'bicluster_tfs_table_shortcode');
-    add_shortcode('minerapi_search_box', 'search_box_shortcode');
     add_shortcode('minerapi_search_results', 'search_results_shortcode');
     add_shortcode('minerapi_no_search_results', 'no_search_results_shortcode');
 

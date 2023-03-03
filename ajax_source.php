@@ -7,7 +7,7 @@ function completions_callback() {
     header("Content-type: application/json");
     $term = $_POST['term'];
     $source_url = get_option('source_url', '');
-    $comps_json = file_get_contents($source_url . "/api/v1.0.0/completions/" . $term);
+    $comps_json = file_get_contents($source_url . "/completions/" . $term);
     echo $comps_json;
     wp_die();
 }
@@ -16,7 +16,7 @@ function bicluster_exps_dt_callback() {
     header("Content-type: application/json");
     $bicluster = $_GET['bicluster'];
     $source_url = get_option('source_url', '');
-    $exps_json = file_get_contents($source_url . "/api/v1.0.0/bicluster_expressions/" . rawurlencode($bicluster));
+    $exps_json = file_get_contents($source_url . "/bicluster_expressions/" . rawurlencode($bicluster));
     $exps = json_decode($exps_json);
     $data = json_encode($exps->data);
     $doc = <<<EOT
@@ -32,7 +32,7 @@ function bicluster_enrichment_dt_callback() {
     header("Content-type: application/json");
     $bicluster = $_GET['bicluster'];
     $source_url = get_option('source_url', '');
-    $exps_json = file_get_contents($source_url . "/api/v1.0.0/bicluster_enrichment/" . rawurlencode($bicluster));
+    $exps_json = file_get_contents($source_url . "/bicluster_enrichment/" . rawurlencode($bicluster));
     $exps = json_decode($exps_json);
     $conditions = json_encode($exps->conditions);
     $expdata = array();
@@ -45,54 +45,6 @@ function bicluster_enrichment_dt_callback() {
 {
   "conditions": $conditions,
   "expressions": $data
-}
-EOT;
-    echo $doc;
-    wp_die();
-}
-
-function bicluster_survival_dt_callback() {
-    header("Content-type: application/json");
-    $bicluster = $_GET['bicluster'];
-    $source_url = get_option('source_url', '');
-    $exps_json = file_get_contents($source_url . "/api/v1.0.0/bicluster_patient_survival/" . rawurlencode($bicluster));
-    $exps = json_decode($exps_json);
-    $data = json_encode($exps->data);
-    $doc = <<<EOT
-{
-  "data": $data
-}
-EOT;
-    echo $doc;
-    wp_die();
-}
-
-function bicluster_ages_dt_callback() {
-    header("Content-type: application/json");
-    $bicluster = $_GET['bicluster'];
-    $source_url = get_option('source_url', '');
-    $exps_json = file_get_contents($source_url . "/api/v1.0.0/bicluster_patient_ages/" . rawurlencode($bicluster));
-    $exps = json_decode($exps_json);
-    $data = json_encode($exps->data);
-    $doc = <<<EOT
-{
-  "data": $data
-}
-EOT;
-    echo $doc;
-    wp_die();
-}
-
-function bicluster_patientstatus_dt_callback() {
-    header("Content-type: application/json");
-    $bicluster = $_GET['bicluster'];
-    $source_url = get_option('source_url', '');
-    $exps_json = file_get_contents($source_url . "/api/v1.0.0/bicluster_patient_status/" . rawurlencode($bicluster));
-    $exps = json_decode($exps_json);
-    $data = json_encode($exps->data);
-    $doc = <<<EOT
-{
-  "data": $data
 }
 EOT;
     echo $doc;
@@ -114,15 +66,6 @@ function minerapi_ajax_source_init()
 
     add_action('wp_ajax_nopriv_bicluster_enrichment_dt', 'bicluster_enrichment_dt_callback');
     add_action('wp_ajax_bicluster_enrichment_dt', 'bicluster_enrichment_dt_callback');
-
-    add_action('wp_ajax_nopriv_bicluster_survival_dt', 'bicluster_survival_dt_callback');
-    add_action('wp_ajax_bicluster_survival_dt', 'bicluster_survival_dt_callback');
-
-    add_action('wp_ajax_nopriv_bicluster_ages_dt', 'bicluster_ages_dt_callback');
-    add_action('wp_ajax_bicluster_ages_dt', 'bicluster_ages_dt_callback');
-
-    add_action('wp_ajax_nopriv_bicluster_patientstatus_dt', 'bicluster_patientstatus_dt_callback');
-    add_action('wp_ajax_bicluster_patientstatus_dt', 'bicluster_patientstatus_dt_callback');
 }
 
 ?>

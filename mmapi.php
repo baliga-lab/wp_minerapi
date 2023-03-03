@@ -122,16 +122,15 @@ function search_minerapi()
     $source_url = get_option('source_url', '');
 
     // Program search -> we just redirect to the Program page
-    if (strpos($search_term, 'Pr-') === 0) {
-        $prognum = str_replace('Pr-', '', $search_term);
+    if (strpos($search_term, 'P-') === 0) {
         // Short circuit program search results
         $page = get_page_by_path('program');
-        wp_safe_redirect(get_permalink($page->ID) . "?program=" . rawurlencode($prognum));
+        wp_safe_redirect(get_permalink($page->ID) . "?program=" . rawurlencode($search_term));
         exit;
     }
 
     // ask search API if there are results for this term and what type
-    $result_json = file_get_contents($source_url . "/api/v1.0.0/cfsearch/" .
+    $result_json = file_get_contents($source_url . "/cfsearch/" .
                                      rawurlencode($search_term));
     $result = json_decode($result_json);
 
