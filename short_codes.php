@@ -155,11 +155,6 @@ function regulator_causalflows_shortcode($attr, $content=null)
     return _regulator_causalflows_shortcode('regulator');
 }
 
-function search_regulator_causalflows_shortcode($attr, $content=null)
-{
-    return _regulator_causalflows_shortcode('search_term');
-}
-
 function program_causalflows_shortcode($attr, $content=null)
 {
     $program = get_query_var('program');
@@ -203,6 +198,33 @@ function search_box_shortcode($attr, $content)
     $content .= "</script>";
     return $content;
 }
+
+function search_regulator_causalflows_shortcode($attr, $content=null)
+{
+    return _regulator_causalflows_shortcode('search_term');
+}
+
+function search_gene_mutation_causalflows_shortcode($attr, $content=null)
+{
+    $search_term = get_query_var('search_term');
+    $source_url = get_option('source_url', '');
+    $result_json = file_get_contents($source_url . "/causalflows_with_mutation_in/" .
+                                     rawurlencode($search_term));
+    return render_causalflows_table($result_json, "mutation_gene_cmf",
+                                    "Causal Mechanistic Flows with Mutation in <b>$search_term</b>");
+}
+
+function search_regulon_gene_causalflows_shortcode($attr, $content=null)
+{
+    $search_term = get_query_var('search_term');
+    $source_url = get_option('source_url', '');
+    $result_json = file_get_contents($source_url . "/causalflows_for_regulons_containing/" .
+                                     rawurlencode($search_term));
+    return render_causalflows_table($result_json, "regulon_gene_cmf",
+                                    "Causal Mechanistic Flows with Regulons containing <b>$search_term</b>");
+}
+
+
 
 function bicluster_cytoscape_shortcode($attr, $content)
 {
@@ -788,6 +810,8 @@ function minerapi_add_shortcodes()
     // Search related short codes
     add_shortcode('minerapi_search_box', 'search_box_shortcode');
     add_shortcode('search_regulator_causalflows', 'search_regulator_causalflows_shortcode');
+    add_shortcode('search_gene_mutation_causalflows', 'search_gene_mutation_causalflows_shortcode');
+    add_shortcode('search_regulon_gene_causalflows', 'search_regulon_gene_causalflows_shortcode');
 
     // Cytoscape related short codes
     add_shortcode('causalflow_regulator_cytoscape', 'causalflow_regulator_cytoscape_shortcode');
