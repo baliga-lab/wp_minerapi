@@ -89,6 +89,10 @@ function bicluster_tfs_table_shortcode($attr, $content=null)
 }
 */
 
+/*
+ * CAUSAL FLOW RELATED SHORT CODES
+ */
+
 function render_causalflows_table($result_json, $table_id, $title)
 {
     $entries = json_decode($result_json)->cm_flows;
@@ -125,6 +129,7 @@ function render_causalflows_table($result_json, $table_id, $title)
     return $content;
 }
 
+
 function regulon_causalflows_shortcode($attr, $content=null)
 {
     $regulon = get_query_var('regulon');
@@ -135,14 +140,24 @@ function regulon_causalflows_shortcode($attr, $content=null)
                                     "Causal Mechanistic Flows for Regulon <b>$regulon</b>");
 }
 
-function regulator_causalflows_shortcode($attr, $content=null)
+function _regulator_causalflows_shortcode($query_var)
 {
-    $regulator = get_query_var('regulator');
+    $regulator = get_query_var($query_var);
     $source_url = get_option('source_url', '');
     $result_json = file_get_contents($source_url . "/causalflows_for_regulator/" .
                                      rawurlencode($regulator));
     return render_causalflows_table($result_json, "regulator_cmf",
                                     "Causal Mechanistic Flows with <b>$regulator</b> as Regulator");
+}
+
+function regulator_causalflows_shortcode($attr, $content=null)
+{
+    return _regulator_causalflows_shortcode('regulator');
+}
+
+function search_regulator_causalflows_shortcode($attr, $content=null)
+{
+    return _regulator_causalflows_shortcode('search_term');
 }
 
 function program_causalflows_shortcode($attr, $content=null)
@@ -165,6 +180,9 @@ function mutation_causalflows_shortcode($attr, $content=null)
                                     "Causal Mechanistic Flows regulated by Mutation <b>$mutation</b>");
 }
 
+/*
+ * SEARCH RELATED SHORT CODES
+ */
 function search_box_shortcode($attr, $content)
 {
     $ajax_action = "completions";
@@ -769,6 +787,7 @@ function minerapi_add_shortcodes()
 
     // Search related short codes
     add_shortcode('minerapi_search_box', 'search_box_shortcode');
+    add_shortcode('search_regulator_causalflows', 'search_regulator_causalflows_shortcode');
 
     // Cytoscape related short codes
     add_shortcode('causalflow_regulator_cytoscape', 'causalflow_regulator_cytoscape_shortcode');
