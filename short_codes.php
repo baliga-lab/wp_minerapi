@@ -89,10 +89,11 @@ function bicluster_tfs_table_shortcode($attr, $content=null)
 }
 */
 
-function render_causalflows_table($result_json, $table_id)
+function render_causalflows_table($result_json, $table_id, $title)
 {
     $entries = json_decode($result_json)->cm_flows;
     $content = "";
+    $content .= "<h3>$title</h3>";
     $content .= "<table id=\"" . $table_id . "\" class=\"stripe row-border\">";
     $content .= "  <thead><tr><th>ID</th><th>Mutation</th><th>Role</th><th>Regulator</th><th>Role</th><th>Regulon</th><th># downstream regulons</th><th># diffexp regulons</th></tr></thead>";
     $content .= "  <tbody>";
@@ -130,7 +131,8 @@ function regulon_causalflows_shortcode($attr, $content=null)
     $source_url = get_option('source_url', '');
     $result_json = file_get_contents($source_url . "/causalflows_for_regulon/" .
                                      rawurlencode($regulon));
-    return render_causalflows_table($result_json, "regulon_cmf");
+    return render_causalflows_table($result_json, "regulon_cmf",
+                                    "Causal Mechanistic Flows for Regulon <b>$regulon</b>");
 }
 
 function regulator_causalflows_shortcode($attr, $content=null)
@@ -139,7 +141,8 @@ function regulator_causalflows_shortcode($attr, $content=null)
     $source_url = get_option('source_url', '');
     $result_json = file_get_contents($source_url . "/causalflows_for_regulator/" .
                                      rawurlencode($regulator));
-    return render_causalflows_table($result_json, "regulator_cmf");
+    return render_causalflows_table($result_json, "regulator_cmf",
+                                    "Causal Mechanistic Flows with <b>$regulator</b> as Regulator");
 }
 
 function program_causalflows_shortcode($attr, $content=null)
@@ -148,7 +151,8 @@ function program_causalflows_shortcode($attr, $content=null)
     $source_url = get_option('source_url', '');
     $result_json = file_get_contents($source_url . "/causalflows_for_program/" .
                                      rawurlencode($program));
-    return render_causalflows_table($result_json, "program_cmf");
+    return render_causalflows_table($result_json, "program_cmf",
+                                    "Causal Mechanistic Flows with Program <b>$program</b>");
 }
 
 function mutation_causalflows_shortcode($attr, $content=null)
@@ -157,7 +161,8 @@ function mutation_causalflows_shortcode($attr, $content=null)
     $source_url = get_option('source_url', '');
     $result_json = file_get_contents($source_url . "/causalflows_for_mutation/" .
                                      rawurlencode($mutation));
-    return render_causalflows_table($result_json, "mutation_cmf");
+    return render_causalflows_table($result_json, "mutation_cmf",
+                                    "Causal Mechanistic Flows regulated by Mutation <b>$mutation</b>");
 }
 
 function search_box_shortcode($attr, $content)
