@@ -640,7 +640,7 @@ function causal_flow_mutation_cytoscape_shortcode($attr, $content)
     return $content;
 }
 
-function causalflow_regulator_cytoscape_shortcode($attr, $content)
+function regulator_causalflows_cytoscape_shortcode($attr, $content)
 {
     $regulator_name = get_query_var('regulator');
     $static_url = get_option('static_url', '');
@@ -659,24 +659,21 @@ function causalflow_regulator_cytoscape_shortcode($attr, $content)
     $content .= "        { selector: '.up_regulates', style: { 'line-color': 'red', 'opacity': 0.5}},";
     $content .= "        { selector: '.down_regulates', style: { 'line-color': 'green', 'opacity': 0.5}},";
 
-    $content .= "        { selector: '.bicluster', style: { 'background-color': 'red', 'shape': 'square'}},";
-    $content .= "        { selector: '.tf', style: { 'background-color': 'blue', 'shape': 'triangle'}},";
+    $content .= "        { selector: '.regulon', style: { 'background-color': 'red', 'shape': 'square'}},";
+    $content .= "        { selector: '.regulator', style: { 'background-color': 'blue', 'shape': 'triangle'}},";
     $content .= "        { selector: '.mutation', style: { 'background-color': '#eb008b', 'shape': 'polygon', 'shape-polygon-points': '-1 -1 0 -0.45 1 -1 0 1'}}";
     $content .= "      ],";
     $content .= "      layout: { name: 'dagre' },";
     $content .= "      elements: " . json_encode(json_decode($result_json));
     $content .= "    });";
-    $content .= "    cy.on('tap', '.bicluster', function (e) {";
-    $content .= "      var bcName = this.data('name');";
-    $content .= "      window.location.href = 'index.php/bicluster/?bicluster=' + bcName;";
+    $content .= "    cy.on('tap', '.regulon', function (e) {";
+    $content .= "      window.location.href = 'index.php/regulon/?regulon=' + this.data('name');";
     $content .= "    });";
     $content .= "    cy.on('tap', '.mutation', function (e) {";
-    $content .= "      var mutName = this.data('name');";
-    $content .= "      window.location.href = 'index.php/mutation/?mutation=' + mutName;";
+    $content .= "      window.location.href = 'index.php/mutation/?mutation=' + this.data('name');";
     $content .= "    });";
-    $content .= "    cy.on('tap', '.tf', function (e) {";
-    $content .= "      var tfName = this.data('name');";
-    $content .= "      window.location.href = 'index.php/regulator/?regulator=' + tfName;";
+    $content .= "    cy.on('tap', '.regulator', function (e) {";
+    $content .= "      window.location.href = 'index.php/regulator/?regulator=' + this.data('name');";
     $content .= "    });";
     $content .= "  });";
     $content .= "</script>";
@@ -814,7 +811,7 @@ function minerapi_add_shortcodes()
     add_shortcode('search_regulon_gene_causalflows', 'search_regulon_gene_causalflows_shortcode');
 
     // Cytoscape related short codes
-    add_shortcode('causalflow_regulator_cytoscape', 'causalflow_regulator_cytoscape_shortcode');
+    add_shortcode('regulator_causalflows_cytoscape', 'regulator_causalflows_cytoscape_shortcode');
 
     // OLD short codes
     /*
