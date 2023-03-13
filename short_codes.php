@@ -795,14 +795,34 @@ function program_cmflow_summary_shortcode($attr, $content=null)
 
     // check if available, otherwise return nothing
     $file_headers = @get_headers($html_url);
-    error_log("CMFLOW HEADERS: " . $file_headers[0]);
-#HTTP/1.1 404 NOT FOUND
     if (!$file_headers || strtoupper($file_headers[0]) == 'HTTP/1.1 404 NOT FOUND'
         || strtoupper($file_headers[0]) == 'HTTP/1.1 400 BAD REQUEST') {
         return "<p>CMFlow summary not available</p>";
     }
     else {
         $content = "<iframe src=\"$html_url\" style=\"width: 100%; height: 280px\"></iframe>";
+        return $content;
+    }
+}
+
+
+function program_enrichment_summary_pdf_shortcode($attr, $content=null)
+{
+    $source_url = get_option('source_url', '');
+    $program = get_query_var('program');
+    $program_num = explode("-", $program)[1];
+    $prog = implode("-", ["PR", $program_num]);
+    $static_url = get_option('static_url', '');
+    $pdf_url = $static_url . "/Program_Enrichment_Summaries/" . rawurlencode($prog) . "_enrichment_summary.pdf";
+
+    // check if available, otherwise return nothing
+    $file_headers = @get_headers($pdf_url);
+    if (!$file_headers || strtoupper($file_headers[0]) == 'HTTP/1.1 404 NOT FOUND'
+        || strtoupper($file_headers[0]) == 'HTTP/1.1 400 BAD REQUEST') {
+        return "<p>Enrichment summary not available</p>";
+    }
+    else {
+        $content = "<iframe src=\"$pdf_url\" style=\"width: 100%; height: 280px\"></iframe>";
         return $content;
     }
 }
@@ -827,6 +847,7 @@ function minerapi_add_shortcodes()
     add_shortcode('program_gene_table', 'program_gene_table_shortcode');
     add_shortcode('program_info', 'program_info_shortcode');
     add_shortcode('program_cmflow_summary', 'program_cmflow_summary_shortcode');
+    add_shortcode('program_enrichment_summary_pdf', 'program_enrichment_summary_pdf_shortcode');
 
     // Gene related short codes
     add_shortcode('gene_info', 'gene_info_shortcode');
