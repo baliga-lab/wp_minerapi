@@ -99,11 +99,12 @@ function render_causalflows_table($result_json, $table_id, $title)
     $content = "";
     $content .= "<h3>$title</h3>";
     $content .= "<table id=\"" . $table_id . "\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>ID</th><th>Mutation</th><th>Role</th><th>Regulator</th><th>Role</th><th>Regulon</th><th># downstream regulons</th><th># diffexp regulons</th></tr></thead>";
+    $content .= "  <thead><tr><th>ID</th><th>Mutation</th><th>Role</th><th>Regulator</th><th>Role</th><th>Regulon</th><th># downstream regulons</th><th># diffexp regulons</th><th>Drugs</th></tr></thead>";
     $content .= "  <tbody>";
     foreach ($entries as $e) {
         $mutgen = $e->mutation_gene_symbol ? $e->mutation_gene_symbol : $e->mutation_gene_ensembl;
         $mutation = ($e->pathway) ? $e->pathway : $mutgen;
+        $drugs = implode(', ', $e->drugs);
 
         $content .= "    <tr><td>" . $e->cmf_id .
 		 "</td><td><a href=\"index.php/mutation/?mutation=" .
@@ -115,7 +116,8 @@ function render_causalflows_table($result_json, $table_id, $title)
          "<a href=\"index.php/regulon/?regulon=" . $e->regulon . "\">" .
 		 $e->regulon . "</a></td><td>" .
 		 $e->num_downstream_regulons . "</td><td>" .
-		 $e->num_diffexp_regulons .
+		 $e->num_diffexp_regulons . "</td><td>" .
+		 $drugs .
 		 "</td></tr>";
     }
     $content .= "  </tbody>";
@@ -781,6 +783,31 @@ function program_info_shortcode($attr, $content=null)
     return $content;
 }
 
+
+function program_cmflow_summary_shortcode($attr, $content=null)
+{
+    $source_url = get_option('source_url', '');
+    $program = get_query_var('program');
+    $program_num = explode("-", $program)[1];
+    $prog = implode("-", ["PR", $program_num]);
+    $static_url = get_option('static_url', '');
+    $html_url = $static_url . "/Program_Enrichment_Summaries/" . rawurlencode($prog) . "_CNFlow_summary.html";
+
+    // check if available, otherwise return nothing
+    $file_headers = @get_headers($html_url);
+    error_log("CMFLOW HEADERS: " . $file_headers[0]);
+#HTTP/1.1 404 NOT FOUND
+    if (!$file_headers || strtoupper($file_headers[0]) == 'HTTP/1.1 404 NOT FOUND'
+        || strtoupper($file_headers[0]) == 'HTTP/1.1 400 BAD REQUEST') {
+        return "<p>CMFlow summary not available</p>";
+    }
+    else {
+        $content = "<iframe src=\"$html_url\" style=\"width: 100%; height: 280px\"></iframe>";
+        return $content;
+    }
+}
+
+
 function minerapi_add_shortcodes()
 {
     add_shortcode('summary', 'summary_shortcode');
@@ -799,6 +826,7 @@ function minerapi_add_shortcodes()
     add_shortcode('program_regulon_table', 'program_regulon_table_shortcode');
     add_shortcode('program_gene_table', 'program_gene_table_shortcode');
     add_shortcode('program_info', 'program_info_shortcode');
+    add_shortcode('program_cmflow_summary', 'program_cmflow_summary_shortcode');
 
     // Gene related short codes
     add_shortcode('gene_info', 'gene_info_shortcode');
