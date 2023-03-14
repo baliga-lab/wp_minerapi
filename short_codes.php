@@ -76,10 +76,20 @@ function render_causalflows_table($result_json, $table_id, $title)
     foreach ($entries as $idx=>$e) {
         $mutgen = $e->mutation_gene_symbol ? $e->mutation_gene_symbol : $e->mutation_gene_ensembl;
         $mutation = ($e->pathway) ? $e->pathway : $mutgen;
-        $regulator_drugs = implode(', ', $e->regulator_drugs);
+        $rd_links1 = array();
+        foreach ($e->regulator_drugs as $d) {
+            array_push($rd_links1, "<a href=\"index.php/drug/?drug=". $d . "\">$d</a>");
+        }
+        $regulator_drugs = implode(', ', $rd_links1);
         $num_regulator_drugs = count($e->regulator_drugs);
-        $regulon_drugs = implode(', ', $e->regulon_drugs);
+
+        $rd_links2 = array();
+        foreach ($e->regulon_drugs as $d) {
+            array_push($rd_links2, "<a href=\"index.php/drug/?drug=". $d . "\">$d</a>");
+        }
+        $regulon_drugs = implode(', ', $rd_links2);
         $num_regulon_drugs = count($e->regulon_drugs);
+
         $num_total_drugs = $num_regulon_drugs + $num_regulator_drugs;
 
         $content .= "    <tr><td>" . $e->cmf_id .
