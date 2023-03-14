@@ -202,6 +202,34 @@ function search_regulon_gene_causalflows_shortcode($attr, $content=null)
                                     "Causal Mechanistic Flows with Regulons containing <b>$search_term</b>");
 }
 
+function drug_info_shortcode($attr, $content=null)
+{
+    $drug_name = get_query_var('drug');
+    $source_url = get_option('source_url', '');
+    $result_json = file_get_contents($source_url . "/drug/" . rawurlencode($drug_name));
+    $drug_info = json_decode($result_json)->drug;
+    $approved = $drug_info->approved > 0 ? "yes": "no";
+    $content = "";
+    $content .= "<h3>$drug_name</h3>";
+    $content .= "<table>";
+    $content .= "  <thead>";
+    $content .= "    <tr><th>Drug Type</th><th>Action Type</th><th>Mechanism of Action</th><th>Approved</th><th>Max Trial Phase</th><th>Max GBM Phase</th></tr>";
+    $content .= "  </thead>";
+    $content .= "  <tbody>";
+    $content .= "    <tr>";
+    $content .= "      <td>" . $drug_info->drug_type . "</td>";
+    $content .= "      <td>" . $drug_info->action_type . "</td>";
+    $content .= "      <td>" . $drug_info->mechanism_of_action . "</td>";
+    $content .= "      <td>" . $approved . "</td>";
+    $content .= "      <td>" . $drug_info->max_trial_phase . "</td>";
+    $content .= "      <td>" . $drug_info->max_phase_gbm . "</td>";
+    $content .= "    </tr>";
+    $content .= "  </tbody>";
+    $content .= "</table>";
+
+    return $content;
+}
+
 function gene_info_table($gene_name)
 {
     $source_url = get_option('source_url', '');
@@ -515,6 +543,9 @@ function minerapi_add_shortcodes()
     // Gene related short codes
     add_shortcode('gene_info', 'gene_info_shortcode');
     add_shortcode('gene_uniprot', 'gene_uniprot_shortcode');
+
+    // Drug related short codes
+    add_shortcode('drug_info', 'drug_info_shortcode');
 
     // Search related short codes
     add_shortcode('minerapi_search_box', 'search_box_shortcode');
