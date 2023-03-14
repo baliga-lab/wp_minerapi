@@ -60,34 +60,6 @@ function regulon_genes_shortcode($attr, $content=null)
     return $content;
 }
 
-/*
-function bicluster_tfs_table_shortcode($attr, $content=null)
-{
-    $bicluster_name = get_query_var('bicluster');
-    $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/bicluster/" .
-                                     rawurlencode($bicluster_name));
-    $entries = json_decode($result_json)->tfs_bc;
-    $content = "<a name=\"regulators\"></a>";
-    //$content .= "<h3>Regulators for regulon " . $bicluster_name . "</h3>";
-    $content .= "<table id=\"bc_tfs\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>Regulator</th><th>Role</th><th>Cox Hazard Ratio</th></tr></thead>";
-    $content .= "  <tbody>";
-    foreach ($entries as $e) {
-        $content .= "    <tr><td><a href=\"index.php/regulator/?regulator=" . $e->tf . "\">" . $e->tf_preferred .
-                 "</a></td><td>" . $e->role . "</td><td>" . $e->hazard_ratio .  "</td></tr>";
-    }
-    $content .= "  </tbody>";
-    $content .= "</table>";
-    $content .= "<script>";
-    $content .= "  jQuery(document).ready(function() {";
-    $content .= "    jQuery('#bc_tfs').DataTable({";
-    $content .= "    })";
-    $content .= "  });";
-    $content .= "</script>";
-    return $content;
-}
-*/
 
 /*
  * CAUSAL FLOW RELATED SHORT CODES
@@ -230,66 +202,6 @@ function search_regulon_gene_causalflows_shortcode($attr, $content=null)
                                     "Causal Mechanistic Flows with Regulons containing <b>$search_term</b>");
 }
 
-
-
-function bicluster_cytoscape_shortcode($attr, $content)
-{
-    $bicluster_name = get_query_var('bicluster');
-    $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/bicluster_network/" .
-                                     rawurlencode($bicluster_name));
-    $content = "";
-    $content .= "<div id=\"cytoscape\"><h3>Causal Mechanistic Flow Network</h3></div>";
-    $content .= "<script>";
-    $content .= "  jQuery(document).ready(function() {";
-    $content .= "    var cy = cytoscape({";
-    $content .= "      container: jQuery('#cytoscape'),";
-    $content .= "      style: [";
-    $content .= "        { selector: 'node', style: { label: 'data(id)'}},";
-    # make these edges colorful 1!!
-    $content .= "        { selector: 'edge', style: { 'line-color': '#000', 'target-arrow-shape': 'triangle', 'target-arrow-color': '#000', 'opacity': 0.8, 'curve-style': 'bezier'}},";
-    $content .= "        { selector: '.bicluster', style: { 'background-color': 'red', 'shape': 'square'}},";
-    $content .= "        { selector: '.tf', style: { 'background-color': 'blue', 'shape': 'triangle'}},";
-    $content .= "        { selector: '.mutation', style: { 'background-color': '#eb008b', 'shape': 'polygon', 'shape-polygon-points': '-1 -1 0 -0.45 1 -1 0 1'}},";
-    $content .= "        { selector: '.activates', style: { 'line-color': 'red', 'opacity': 0.5}},";
-    $content .= "        { selector: '.represses', style: { 'line-color': 'green', 'opacity': 0.5}},";
-    $content .= "        { selector: '.up_regulates', style: { 'line-color': 'red', 'opacity': 0.5}},";
-    $content .= "        { selector: '.down_regulates', style: { 'line-color': 'green', 'opacity': 0.5}},";
-    $content .= "      ],";
-    $content .= "      layout: { name: 'dagre' },";
-    $content .= "      elements: " . json_encode(json_decode($result_json)->elements);
-    $content .= "    });";
-    $content .= "  });";
-    $content .= "</script>";
-    return $content;
-}
-
-function gene_biclusters_table_shortcode($attr, $content=null)
-{
-    $gene_name = get_query_var('gene');
-    $source_url = get_option('source_url', '');
-    $result_json = file_get_contents($source_url . "/biclusters_for_gene/" .
-                                     rawurlencode($gene_name));
-    $entries = json_decode($result_json)->biclusters;
-    $content = "";
-    //$content = "<h3>Regulons for gene " . $gene_name . "</h3>";
-    $content .= "<table id=\"biclusters\" class=\"stripe row-border\">";
-    $content .= "  <thead><tr><th>Regulon</th><th>Survival (Hazard Ratio)</th></tr></thead>";
-    $content .= "  <tbody>";
-    foreach ($entries as $e) {
-        $content .= "    <tr><td><a href=\"index.php/bicluster/?bicluster=" . $e->cluster_id . "\">" . $e->cluster_id . "</a></td><td>$e->hazard_ratio</td></tr>";
-    }
-    $content .= "  </tbody>";
-    $content .= "</table>";
-    $content .= "<script>";
-    $content .= "  jQuery(document).ready(function() {";
-    $content .= "    jQuery('#biclusters').DataTable({";
-    $content .= "    })";
-    $content .= "  });";
-    $content .= "</script>";
-    return $content;
-}
-
 function gene_info_table($gene_name)
 {
     $source_url = get_option('source_url', '');
@@ -390,260 +302,10 @@ function regulon_summary_shortcode($attr, $content)
     return $content;
 }
 
-function bicluster_expressions_graph_shortcode($attr, $content)
-{
-    $bicluster_name = get_query_var('bicluster');
-
-    $source_url = get_option('source_url', '');
-    $content .= '<div id="bicluster_exps" style="width: 100%; height: 300px"></div>';
-    $content .= "<script>\n";
-    $content .= "    function makeBiclusterExpChart(data) {";
-    $content .= "      var x, chart = Highcharts.chart('bicluster_exps', {\n";
-    $content .= "        chart: { type: 'boxplot' },";
-    $content .= "        title: { text: 'Regulon Expression' },\n";
-    $content .= "        xAxis: { title: { text: 'Conditions' }},\n";
-    $content .= "        yAxis: { title: { text: 'Relative expression'} },\n";
-    $content .= "        series: [{name: 'All', showInLegend: false, colorByPoint: true, data: data.data}]\n";
-    $content .= "     })\n";
-    $content .= "   }\n";
-
-    $content .= "  function loadBiclusterExpressions() {\n";
-    $content .= "    jQuery.ajax({\n";
-    $content .= "      url: ajax_dt.ajax_url,\n";
-    $content .= "      method: 'GET',\n";
-    $content .= "      data: {'action': 'bicluster_exps_dt', 'bicluster': '" . $bicluster_name . "' }\n";
-    $content .= "    }).done(function(data) {\n";
-    $content .= "      makeBiclusterExpChart(data);\n";
-    $content .= "    });\n";
-    $content .= "  };\n";
-
-
-    $content .= "  jQuery(document).ready(function() {\n";
-    $content .= "    loadBiclusterExpressions();\n";
-    $content .= "  });\n";
-    $content .= "</script>\n";
-    return $content;
-}
-
 function regulon_name_shortcode($attr, $content)
 {
     $regulon_name = get_query_var('regulon');
     return $regulon_name;
-}
-
-function bicluster_enrichment_graph_shortcode($attr, $content)
-{
-    $bicluster_name = get_query_var('bicluster');
-
-    $source_url = get_option('source_url', '');
-    $content .= '<div id="bicluster_enrich" style="width: 100%; height: 300px"></div>';
-    $content .= "<script>\n";
-    $content .= "    function makeBiclusterEnrichmentChart(data, conds) {";
-    $content .= "      var x, chart = Highcharts.chart('bicluster_enrich', {\n";
-    $content .= "        chart: { type: 'column' },";
-    $content .= "        title: { text: 'Enrichment of Tumor Subtypes in Quintiles (Example Data)' },\n";
-    $content .= "        xAxis: { title: { text: 'Conditions' }, categories: conds,\n";
-    $content .= "                 labels: {\n";
-    $content .= "                   formatter: function() {\n";
-    $content .= "                     return this.axis.categories.indexOf(this.value);\n";
-    $content .= "                   }}},\n";
-    $content .= "        yAxis: { title: { text: 'Enrichment of Subtypes in Quintiles'} },\n";
-    $content .= "        series: data\n";
-    $content .= "     })\n";
-    $content .= "   }\n";
-
-    $content .= "  function loadBiclusterEnrichment() {\n";
-    $content .= "    jQuery.ajax({\n";
-    $content .= "      url: ajax_dt.ajax_url,\n";
-    $content .= "      method: 'GET',\n";
-    $content .= "      data: {'action': 'bicluster_enrichment_dt', 'bicluster': '" . $bicluster_name . "' }\n";
-    $content .= "    }).done(function(data) {\n";
-    $content .= "      makeBiclusterEnrichmentChart(data.expressions, data.conditions);\n";
-    $content .= "    });\n";
-    $content .= "  };\n";
-
-
-    $content .= "  jQuery(document).ready(function() {\n";
-    $content .= "    loadBiclusterEnrichment();\n";
-    $content .= "  });\n";
-    $content .= "</script>\n";
-    return $content;
-}
-
-
-function bicluster_hallmarks_shortcode($attr, $content)
-{
-    $content = "";
-    $content = "<a name=\"hallmarks\"></a>";
-    $content .= "<div style=\"width:100%\">";
-    $content .= "<div style=\"width: 45%; display: inline-block; vertical-align: top\">";
-    $content .= "  <b>Regulon is enriched for the following hallmarks of cancer</b>";
-    $content .= "  <ul style=\"list-style: none\">";
-    $content .= "    <li><img style=\"width: 20px\" src=\"" . esc_url(plugins_url('images/angiogenesis.gif', __FILE__)). "\"> Inducing angiogenesis</li>";
-    $content .= "  </ul>";
-
-    $content .= "</div>";
-    $content .= "<div style=\"width: 50%; display: inline-block\">";
-    $content .= "  <h4>Legend</h4>";
-    $content .= "  <img src=\"" . esc_url(plugins_url('images/legend.jpg', __FILE__)). "\">";
-    $content .= "</div>";
-    $content .= "</div>";
-    return $content;
-}
-
-function regulator_survival_plot_shortcode($attr, $content=null)
-{
-    $regulator_name = get_query_var('regulator');
-    $static_url = get_option('static_url', '');
-    $img_url = $static_url . "/survival_plots_tf/" . rawurlencode($regulator_name) . ".png";
-
-    // check if available, otherwise return nothing
-    $file_headers = @get_headers($img_url);
-    if (!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found'
-        || $file_headers[0] == 'HTTP/1.1 400 Bad Request') {
-        return "<p>no survival information available</p>";
-    }
-    else {
-        return "<img src=\"" . $img_url . "\"></img>";
-    }
-}
-
-function bicluster_survival_plot_shortcode($attr, $content=null)
-{
-    $bicluster_name = get_query_var('bicluster');
-    $rname = str_replace("R-", "regulon_", $bicluster_name) . "_survival";
-    $static_url = get_option('static_url', '');
-    // check if available, otherwise return nothing
-    $img_url = $static_url . "/regulon_survival_plots/" . rawurlencode($rname) . ".png";
-    $file_headers = @get_headers($img_url);
-    if (!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found'
-        || $file_headers[0] == 'HTTP/1.1 400 Bad Request') {
-        return "<p>no survival information available</p>";
-    }
-    else {
-        return "<img src=\"" . $img_url . "\"></img>";
-    }
-}
-
-function mutation_survival_plot_shortcode($attr, $content=null)
-{
-    $mutation_name = get_query_var('mutation');
-    $mname = "mutation_" . $mutation_name . "_survival";
-    $static_url = get_option('static_url', '');
-    // check if available, otherwise return nothing
-    $img_url = $static_url . "/mutation_survival_plots/" . rawurlencode($mname) . ".png";
-    $file_headers = @get_headers($img_url);
-    if (!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found'
-        || $file_headers[0] == 'HTTP/1.1 400 Bad Request') {
-        return "<p>no survival information available</p>";
-    }
-    else {
-        return "<img src=\"" . $img_url . "\"></img>";
-    }
-}
-
-
-function program_survival_plot_shortcode($attr, $content=null)
-{
-    $program_name = get_query_var('program');
-    $pname = "program_" . $program_name . "_survival";
-    $static_url = get_option('static_url', '');
-    // check if available, otherwise return nothing
-    $img_url = $static_url . "/program_survival_plots/" . rawurlencode($pname) . ".png";
-    $file_headers = @get_headers($img_url);
-    if (!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found'
-        || $file_headers[0] == 'HTTP/1.1 400 Bad Request') {
-        return "<p>no survival information available</p>";
-    }
-    else {
-        return "<img src=\"" . $img_url . "\"></img>";
-    }
-}
-
-function causal_flow_cytoscape_shortcode($attr, $content)
-{
-    $static_url = get_option('static_url', '');
-    $result_json = file_get_contents($static_url . "/mm_cytoscape.json");
-    $content = "";
-    $content .= "<div id=\"cytoscape2\"></div>";
-    $content .= "<script>";
-    $content .= "  jQuery(document).ready(function() {";
-    $content .= "    var cy = cytoscape({";
-    $content .= "      container: jQuery('#cytoscape2'),";
-    $content .= "      style: [";
-    $content .= "        { selector: 'node', style: { label: 'data(name)'}},";
-    $content .= "        { selector: 'edge', style: { 'line-color': '#000', 'width': 3, 'opacity': 0.5}},";
-    $content .= "        { selector: '.activates', style: { 'line-color': 'red', 'opacity': 0.5}},";
-    $content .= "        { selector: '.represses', style: { 'line-color': 'green', 'opacity': 0.5}},";
-    $content .= "        { selector: '.up_regulates', style: { 'line-color': 'red', 'opacity': 0.5}},";
-    $content .= "        { selector: '.down_regulates', style: { 'line-color': 'green', 'opacity': 0.5}},";
-
-    $content .= "        { selector: '.bicluster', style: { 'background-color': 'red', 'shape': 'square'}},";
-    $content .= "        { selector: '.tf', style: { 'background-color': 'blue', 'shape': 'triangle'}},";
-    $content .= "        { selector: '.mutation', style: { 'background-color': '#eb008b', 'shape': 'polygon', 'shape-polygon-points': '-1 -1 0 -0.45 1 -1 0 1'}}";
-    $content .= "      ],";
-    #$content .= "      layout: { name: 'cose-bilkent' },";
-    $content .= "      layout: { name: 'dagre' },";
-    $content .= "      elements: " . json_encode(json_decode($result_json));
-    $content .= "    });";
-    $content .= "    cy.on('tap', '.bicluster', function (e) {";
-    $content .= "      var bcName = this.data('name');";
-    $content .= "      window.location.href = 'index.php/bicluster/?bicluster=' + bcName;";
-    $content .= "    });";
-    $content .= "    cy.on('tap', '.mutation', function (e) {";
-    $content .= "      var mutName = this.data('name');";
-    $content .= "      window.location.href = 'index.php/mutation/?mutation=' + mutName;";
-    $content .= "    });";
-    $content .= "    cy.on('tap', '.tf', function (e) {";
-    $content .= "      var tfName = this.data('name');";
-    $content .= "      window.location.href = 'index.php/regulator/?regulator=' + tfName;";
-    $content .= "    });";
-    $content .= "  });";
-    $content .= "</script>";
-    return $content;
-}
-
-function causal_flow_mutation_cytoscape_shortcode($attr, $content)
-{
-    $mutation_name = get_query_var('mutation');
-    $static_url = get_option('static_url', '');
-    $result_json = file_get_contents($static_url . "/cytoscape/mutations/" . $mutation_name . ".json");
-    $content = "";
-    $content .= "<div id=\"cytoscape_mutation\"></div>";
-    $content .= "<script>";
-    $content .= "  jQuery(document).ready(function() {";
-    $content .= "    var cy = cytoscape({";
-    $content .= "      container: jQuery('#cytoscape_mutation'),";
-    $content .= "      style: [";
-    $content .= "        { selector: 'node', style: { label: 'data(name)'}},";
-    $content .= "        { selector: 'edge', style: { 'line-color': '#000', 'width': 3, 'opacity': 0.5}},";
-    $content .= "        { selector: '.activates', style: { 'line-color': 'red', 'opacity': 0.5}},";
-    $content .= "        { selector: '.represses', style: { 'line-color': 'green', 'opacity': 0.5}},";
-    $content .= "        { selector: '.up_regulates', style: { 'line-color': 'red', 'opacity': 0.5}},";
-    $content .= "        { selector: '.down_regulates', style: { 'line-color': 'green', 'opacity': 0.5}},";
-
-    $content .= "        { selector: '.bicluster', style: { 'background-color': 'red', 'shape': 'square'}},";
-    $content .= "        { selector: '.tf', style: { 'background-color': 'blue', 'shape': 'triangle'}},";
-    $content .= "        { selector: '.mutation', style: { 'background-color': '#eb008b', 'shape': 'polygon', 'shape-polygon-points': '-1 -1 0 -0.45 1 -1 0 1'}}";
-    $content .= "      ],";
-    $content .= "      layout: { name: 'dagre' },";
-    $content .= "      elements: " . json_encode(json_decode($result_json));
-    $content .= "    });";
-    $content .= "    cy.on('tap', '.bicluster', function (e) {";
-    $content .= "      var bcName = this.data('name');";
-    $content .= "      window.location.href = 'index.php/regulon/?regulon=' + bcName;";
-    $content .= "    });";
-    $content .= "    cy.on('tap', '.mutation', function (e) {";
-    $content .= "      var mutName = this.data('name');";
-    $content .= "      window.location.href = 'index.php/mutation/?mutation=' + mutName;";
-    $content .= "    });";
-    $content .= "    cy.on('tap', '.tf', function (e) {";
-    $content .= "      var tfName = this.data('name');";
-    $content .= "      window.location.href = 'index.php/regulator/?regulator=' + tfName;";
-    $content .= "    });";
-    $content .= "  });";
-    $content .= "</script>";
-    return $content;
 }
 
 function regulator_causalflows_cytoscape_shortcode($attr, $content)
@@ -787,7 +449,6 @@ function program_info_shortcode($attr, $content=null)
     return $content;
 }
 
-
 function program_cmflow_summary_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
@@ -809,7 +470,6 @@ function program_cmflow_summary_shortcode($attr, $content=null)
     }
 }
 
-
 function program_enrichment_summary_pdf_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
@@ -830,7 +490,6 @@ function program_enrichment_summary_pdf_shortcode($attr, $content=null)
         return $content;
     }
 }
-
 
 function minerapi_add_shortcodes()
 {
@@ -865,25 +524,6 @@ function minerapi_add_shortcodes()
 
     // Cytoscape related short codes
     add_shortcode('regulator_causalflows_cytoscape', 'regulator_causalflows_cytoscape_shortcode');
-
-    // OLD short codes
-    /*
-    add_shortcode('bicluster_tfs_table', 'bicluster_tfs_table_shortcode');
-    add_shortcode('gene_biclusters_table', 'gene_biclusters_table_shortcode');
-    add_shortcode('bicluster_cytoscape', 'bicluster_cytoscape_shortcode');
-    add_shortcode('bicluster_expressions', 'bicluster_expressions_graph_shortcode');
-    add_shortcode('bicluster_enrichment', 'bicluster_enrichment_graph_shortcode');
-    add_shortcode('bicluster_hallmarks', 'bicluster_hallmarks_shortcode');
-
-    add_shortcode('regulator_survival_plot', 'regulator_survival_plot_shortcode');
-    add_shortcode('bicluster_survival_plot', 'bicluster_survival_plot_shortcode');
-    add_shortcode('mutation_survival_plot', 'mutation_survival_plot_shortcode');
-    add_shortcode('program_survival_plot', 'program_survival_plot_shortcode');
-
-    add_shortcode('causal_flow_table', 'causal_flow_table_shortcode');
-    add_shortcode('causal_flow_cytoscape', 'causal_flow_cytoscape_shortcode');
-    add_shortcode('causal_flow_mutation_cytoscape', 'causal_flow_mutation_cytoscape_shortcode');
-    */
 }
 
 ?>
