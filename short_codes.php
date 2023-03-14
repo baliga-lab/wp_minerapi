@@ -104,8 +104,11 @@ function render_causalflows_table($result_json, $table_id, $title)
     foreach ($entries as $idx=>$e) {
         $mutgen = $e->mutation_gene_symbol ? $e->mutation_gene_symbol : $e->mutation_gene_ensembl;
         $mutation = ($e->pathway) ? $e->pathway : $mutgen;
-        $drugs = implode(', ', $e->drugs);
-        $num_drugs = count($e->drugs);
+        $regulator_drugs = implode(', ', $e->regulator_drugs);
+        $num_regulator_drugs = count($e->regulator_drugs);
+        $regulon_drugs = implode(', ', $e->regulon_drugs);
+        $num_regulon_drugs = count($e->regulon_drugs);
+        $num_total_drugs = $num_regulon_drugs + $num_regulator_drugs;
 
         $content .= "    <tr><td>" . $e->cmf_id .
 		 "</td><td><a href=\"index.php/mutation/?mutation=" .
@@ -118,7 +121,7 @@ function render_causalflows_table($result_json, $table_id, $title)
 		 $e->regulon . "</a></td><td>" .
 		 $e->num_downstream_regulons . "</td><td>" .
 		 $e->num_diffexp_regulons . "</td><td>" .
-         "<a href=\"#coll_$idx\" data-toggle=\"collapse\" aria-expanded=\"false\" aria-controls=\"help\"><i class=\"fas fa-info-circle pull-right\"></i></a><div class=\"collapse\" id=\"coll_$idx\"><div class=\"card card-body\"><p class=\"card-text\"><h4>Regulator Drugs ($num_drugs)</h4><p>$drugs</p></div>" .
+         "Drugs ($num_total_drugs) <a href=\"#coll_$idx\" data-toggle=\"collapse\" aria-expanded=\"false\" aria-controls=\"help\"><i class=\"fas fa-info-circle pull-right\"></i></a><div class=\"collapse\" id=\"coll_$idx\"><div class=\"card card-body\"><p class=\"card-text\"><h4>Regulator Drugs ($num_regulator_drugs)</h4><p>$regulator_drugs</p><h4>Regulon Drugs ($num_regulon_drugs)</h4><p>$regulon_drugs</p</div>" .
 		 "</td></tr>";
     }
     $content .= "  </tbody>";
