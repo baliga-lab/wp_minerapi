@@ -327,13 +327,18 @@ function regulon_summary_shortcode($attr, $content)
     $result = json_decode($result_json);
     $num_genes = count($result->genes);
     $num_regulators = count($result->regulon_regulators);
-    $drugs = implode(', ', $result->drugs);
+    $hallmark_links = array();
+    $static_url = get_option('static_url', '');
+    foreach ($result->hallmarks as $h) {
+        array_push($hallmark_links, "<img src=\"$static_url/images/$h->image\" title=\"$h->name\" alt=\"$h->name\" width=\"20\"></img>");
+    }
+    $hallmarks = implode('', $hallmark_links);
 
     $content = "";
     $content .= "<table id=\"summary1\" class=\"row-border\" style=\"margin-bottom: 10px\">";
-    $content .= "  <thead><tr><th>Genes</th><th>Cox Hazard Ratio</th><th>Regulators</th><th>Causal Flows</th><th>Transcriptional Programs</th><th>Drugs</th></tr></thead>";
+    $content .= "  <thead><tr><th>Genes</th><th>Cox Hazard Ratio</th><th>Regulators</th><th>Causal Flows</th><th>Transcriptional Programs</th><th>Hallmarks</th></tr></thead>";
     $content .= "  <tbody>";
-    $content .= "    <tr><td><a href=\"#genes\">$num_genes</a></td><td>$result->hazard_ratio</td><td><a href=\"#regulators\">$num_regulators</a></td><td>$result->num_causal_flows</td><td><a href=\"index.php/program/?program=" . $result->program . "\">" . $result->program . "</a></td><td>$drugs</td></tr>";
+    $content .= "    <tr><td><a href=\"#genes\">$num_genes</a></td><td>$result->hazard_ratio</td><td><a href=\"#regulators\">$num_regulators</a></td><td>$result->num_causal_flows</td><td><a href=\"index.php/program/?program=" . $result->program . "\">" . $result->program . "</a></td><td>$hallmarks</td></tr>";
     $content .= "  </tbody>";
     $content .= "</table>";
 
@@ -402,7 +407,7 @@ function program_regulon_table_shortcode($attr, $content=null)
     $content .= "</tr></thead>";
     $content .= "  <tbody>";
     foreach ($regulons as $r) {
-        $content .= "    <tr><td><a href=\"index.php/bicluster/?bicluster=" . $r->name . "\">$r->name</a></td>";
+        $content .= "    <tr><td><a href=\"index.php/regulon/?regulon=" . $r->name . "\">$r->name</a></td>";
         $content .= "<td>$r->cox_hazard_ratio</td>";
         $content .= "<td>$r->num_genes</td>";
         $content .= "<td>$r->num_causal_flows</td>";
