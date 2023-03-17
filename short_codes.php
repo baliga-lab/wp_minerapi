@@ -52,11 +52,13 @@ function regulon_genes_shortcode($attr, $content=null)
                                      rawurlencode($regulon_name));
     $entries = json_decode($result_json)->genes;
     $content = "<a name=\"genes\"></a>";
-    $content .= "<ul style=\"list-style: none\">";
+    //$content .= "<ul style=\"list-style: none\">";
+    $content .= _render_gene_table($entries);
+    /*
     foreach ($entries as $e) {
-        $content .= "  <li style=\"display: inline\"><a href=\"index.php/gene?gene=" . $e . "\">" . $e . "</a></li>";
-    }
-    $content .= "</ul>";
+        $content .= "  <li style=\"display: inline\"><a href=\"index.php/gene?gene=" . $e->preferred . "\">" . $e->preferred . "</a></li>";
+        }*/
+    //$content .= "</ul>";
     return $content;
 }
 
@@ -85,7 +87,7 @@ function render_causalflows_table($result_json, $table_id, $title)
 
         $rd_links2 = array();
         foreach ($e->regulon_drugs as $d) {
-            array_push($rd_links2, "<a href=\"index.php/drug/?drug=". $d . "\">$d</a>");
+            array_push($rd_links2, "<a href=\"index.php/drug/?drug=". $d->name . "\">$d->name</a>");
         }
         $regulon_drugs = implode(', ', $rd_links2);
         $num_regulon_drugs = count($e->regulon_drugs);
@@ -240,6 +242,30 @@ function drug_info_shortcode($attr, $content=null)
     return $content;
 }
 
+function _render_gene_table($gene_infos) {
+    $content = "<table>";
+    $content .= "  <thead>";
+    $content .= "    <tr><th>Entrez ID</th><th>EnsEMBL ID</th><th>Preferred Name</th><th>Uniprot ID</th></tr>";
+    $content .= "  </thead>";
+    $content .= "  <tbody>";
+    foreach ($gene_infos as $gene_info) {
+        if ($gene_info->entrez_id == null) { $entrez_link = '-'; }
+        else {
+            $entrez_link = "<a href=\"https://www.ncbi.nlm.nih.gov/gene/?term=" . $gene_info->entrez_id . "\" target=\"_blank\">" . $gene_info->entrez_id . "</a>";
+        }
+
+        $content .= "    <tr>";
+        $content .= "      <td>" . $entrez_link . "</td>";
+        $content .= "      <td><a href=\"http://www.ensembl.org/id/" . $gene_info->ensembl_id . "\" target=\"_blank\">" . $gene_info->ensembl_id . "</a></td>";
+        $content .= "      <td>" . $gene_info->preferred . "</td>";
+        $content .= "      <td><a href=\"https://www.uniprot.org/uniprot/" . $gene_info->uniprot_id . "\" target=\"_blank\">" . $gene_info->uniprot_id . "</a></td>";
+        $content .= "    </tr>";
+    }
+    $content .= "  </tbody>";
+    $content .= "</table>";
+    return $content;
+}
+
 function gene_info_table($gene_name)
 {
     $source_url = get_option('source_url', '');
@@ -256,30 +282,12 @@ function gene_info_table($gene_name)
         $preferred_name = $gene_name;
         $gene_info->preferred = '-';
     }
-    if ($gene_info->entrez_id == null) { $entrez_link = '-'; }
-    else {
-        $entrez_link = "<a href=\"https://www.ncbi.nlm.nih.gov/gene/?term=" . $gene_info->entrez_id . "\" target=\"_blank\">" . $gene_info->entrez_id . "</a>";
-    }
 
     $desc = preg_replace('/\[.*\]/', '', $gene_info->description);
     $content .= "<h3>" . $preferred_name . " - " . $desc;
     $content .= "</h3>";
     $content .= "<a href=\"index.php/gene-uniprot/?gene=" . $gene_name . "\">" . "Uniprot Browser" . "</a>";
-    $content .= "<table>";
-    $content .= "  <thead>";
-    $content .= "    <tr><th>Entrez ID</th><th>EnsEMBL ID</th><th>Preferred Name</th><th>Uniprot ID</th></tr>";
-    $content .= "  </thead>";
-    $content .= "  <tbody>";
-    $content .= "    <tr>";
-    $content .= "      <td>" . $entrez_link . "</td>";
-    $content .= "      <td><a href=\"http://www.ensembl.org/id/" . $gene_info->ensembl_id . "\" target=\"_blank\">" . $gene_info->ensembl_id . "</a></td>";
-    $content .= "      <td>" . $gene_info->preferred . "</td>";
-    $content .= "      <td><a href=\"https://www.uniprot.org/uniprot/" . $gene_info->uniprot_id . "\" target=\"_blank\">" . $gene_info->uniprot_id . "</a></td>";
-    $content .= "    </tr><tr>";
-    //$content .= "      <td colspan=\"4\"><b>Function:</b> " . $gene_info->function . "</td>";
-    $content .= "    </tr>";
-    $content .= "  </tbody>";
-    $content .= "</table>";
+    $content .= _render_gene_table([$gene_info]);
     $content .= "";
     return $content;
 }
