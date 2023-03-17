@@ -257,7 +257,7 @@ function _render_gene_table($gene_infos) {
         $content .= "    <tr>";
         $content .= "      <td>" . $entrez_link . "</td>";
         $content .= "      <td><a href=\"http://www.ensembl.org/id/" . $gene_info->ensembl_id . "\" target=\"_blank\">" . $gene_info->ensembl_id . "</a></td>";
-        $content .= "      <td>" . $gene_info->preferred . "</td>";
+        $content .= "      <td><a href=\"index.php/gene/?gene=$gene_info->preferred\">$gene_info->preferred</a></td>";
         $content .= "      <td><a href=\"https://www.uniprot.org/uniprot/" . $gene_info->uniprot_id . "\" target=\"_blank\">" . $gene_info->uniprot_id . "</a></td>";
         $content .= "    </tr>";
     }
