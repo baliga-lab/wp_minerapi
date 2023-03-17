@@ -52,13 +52,46 @@ function regulon_genes_shortcode($attr, $content=null)
                                      rawurlencode($regulon_name));
     $entries = json_decode($result_json)->genes;
     $content = "<a name=\"genes\"></a>";
-    //$content .= "<ul style=\"list-style: none\">";
     $content .= _render_gene_table($entries);
-    /*
-    foreach ($entries as $e) {
-        $content .= "  <li style=\"display: inline\"><a href=\"index.php/gene?gene=" . $e->preferred . "\">" . $e->preferred . "</a></li>";
-        }*/
-    //$content .= "</ul>";
+    return $content;
+}
+
+/*
+ * Render drug information as a table
+ */
+function _render_drug_table($drug_infos) {
+    $content = "<table id=\"regulon_drugs\">";
+    $content .= "  <thead>";
+    $content .= "    <tr><th>Name</th><th>Approved Symbol</th><th>Type</th><th>Action Type</th><th>Mechanism of Action</th><th>Max Trial Phase</th><th>Max GBM Phase</th></tr>";
+    $content .= "  </thead>";
+    $content .= "  <tbody>";
+    foreach ($drug_infos as $d) {
+        $content .= "    <tr>";
+        $content .= "      <td>$d->name</td><td>$d->approved_symbol</td><td>$d->drug_type</td><td>$d->action_type</td>";
+        $content .= "<td>$d->mechanism_of_action</td><td>$d->max_trial_phase</td><td>$d->max_gbm_phase</td>";
+        $content .= "    </tr>";
+    }
+    $content .= "  </tbody>";
+    $content .= "</table>";
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {";
+
+    $content .= "    jQuery('#regulon_drugs').DataTable({";
+    $content .= "    });";
+    $content .= "  });";
+    $content .= "</script>";
+    return $content;
+}
+
+function regulon_drugs_shortcode($attr, $content=null)
+{
+    $regulon_name = get_query_var('regulon');
+    $source_url = get_option('source_url', '');
+    $result_json = file_get_contents($source_url . "/regulon_drugs/" .
+                                     rawurlencode($regulon_name));
+    $entries = json_decode($result_json)->drugs;
+    $content = "<a name=\"drugs\"></a>";
+    $content .= _render_drug_table($entries);
     return $content;
 }
 
@@ -548,6 +581,7 @@ function minerapi_add_shortcodes()
 
     // Regulon short codes
     add_shortcode('regulon_genes', 'regulon_genes_shortcode');
+    add_shortcode('regulon_drugs', 'regulon_drugs_shortcode');
     add_shortcode('regulon_causalflows', 'regulon_causalflows_shortcode');
     add_shortcode('regulator_causalflows', 'regulator_causalflows_shortcode');
     add_shortcode('program_causalflows', 'program_causalflows_shortcode');
