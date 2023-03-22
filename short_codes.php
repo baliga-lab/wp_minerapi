@@ -317,8 +317,11 @@ function gene_info_table($gene_name)
     }
 
     $desc = preg_replace('/\[.*\]/', '', $gene_info->description);
+
     $content .= "<h3>" . $preferred_name . " - " . $desc;
     $content .= "</h3>";
+    $content .= "<h4>Function</h4>";
+    $content .= "<p>$gene_info->function</p>";
     $content .= "<a href=\"index.php/gene-uniprot/?gene=" . $gene_name . "\">" . "Uniprot Browser" . "</a>";
     $content .= _render_gene_table([$gene_info]);
     $content .= "";

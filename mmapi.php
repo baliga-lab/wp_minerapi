@@ -103,13 +103,18 @@ function minerapi_init()
     wp_enqueue_script('d3', plugin_dir_url(__FILE__) . 'js/d3.min.js', array('jquery'));
     wp_enqueue_script('datatables', plugin_dir_url(__FILE__) . 'js/jquery.dataTables.min.js', array('jquery'));
     wp_enqueue_script('qtip', plugin_dir_url(__FILE__) . 'js/jquery.qtip.min.js', array('jquery'), false, true);
+
+    // Highcharts
     wp_enqueue_script('highcharts', plugin_dir_url(__FILE__) . 'js/highcharts.js', array('jquery'));
     wp_enqueue_script('highcharts-more', plugin_dir_url(__FILE__) . 'js/highcharts-more.js', array('jquery'));
     wp_enqueue_script('histogram-bellcurve', plugin_dir_url(__FILE__) . 'js/histogram-bellcurve.js', array('jquery'));
+    /*
+    // Cytoscape.js
     wp_enqueue_script('cytoscape', plugin_dir_url(__FILE__) . 'js/cytoscape.min.js');
     wp_enqueue_script('dagre', plugin_dir_url(__FILE__) . 'js/dagre.min.js');
     wp_enqueue_script('cytoscape-dagre', plugin_dir_url(__FILE__) . 'js/cytoscape-dagre.js');
     wp_enqueue_script('cytoscape-cose-bilkent', plugin_dir_url(__FILE__) . 'js/cytoscape-cose-bilkent.js');
+    */
 
     minerapi_add_shortcodes();
     minerapi_ajax_source_init();
