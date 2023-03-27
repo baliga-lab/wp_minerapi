@@ -597,7 +597,6 @@ function mutations_table_shortcode($attr, $content=null)
     $content .= "</table>";
     $content .= "<script>";
     $content .= "  jQuery(document).ready(function() {";
-
     $content .= "    jQuery('#mutations').DataTable({});";
     $content .= "  });";
     $content .= "</script>";
@@ -623,8 +622,32 @@ function regulators_table_shortcode($attr, $content=null)
     $content .= "</table>";
     $content .= "<script>";
     $content .= "  jQuery(document).ready(function() {";
-
     $content .= "    jQuery('#regulators').DataTable({});";
+    $content .= "  });";
+    $content .= "</script>";
+    return $content;
+}
+
+function regulons_table_shortcode($attr, $content=null)
+{
+    $source_url = get_option('source_url', '');
+    $result_json = file_get_contents($source_url . "/regulons");
+    $entries = json_decode($result_json)->entries;
+    $content = "<table id=\"regulons\">";
+    $content .= "  <thead>";
+    $content .= "    <tr><th>Regulon</th><th>Program</th><th># genes</th><th># regulators</th><th># causal flows</th></tr>";
+    $content .= "  </thead>";
+    $content .= "  <tbody>";
+    foreach ($entries as $r) {
+        $content .= "    <tr>";
+        $content .= "      <td><a href=\"index.php/regulon/?regulon=$r->regulon\">$r->regulon</a></td><td><a href=\"index.php/program/?program=$r->program\">$r->program</a></td><td>$r->num_genes</td><td>$r->num_regulators</td><td>$r->num_causalflows</td>";
+        $content .= "    </tr>";
+    }
+    $content .= "  </tbody>";
+    $content .= "</table>";
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {";
+    $content .= "    jQuery('#regulons').DataTable({});";
     $content .= "  });";
     $content .= "</script>";
     return $content;
@@ -663,6 +686,7 @@ function minerapi_add_shortcodes()
     // Lists
     add_shortcode('mutations_table', 'mutations_table_shortcode');
     add_shortcode('regulators_table', 'regulators_table_shortcode');
+    add_shortcode('regulons_table', 'regulons_table_shortcode');
 
 
     // Search related short codes
