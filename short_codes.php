@@ -595,6 +595,7 @@ function mutations_table_shortcode($attr, $content=null)
         $content .= "    </tr>";
     }
     $content .= "  </tbody>";
+    $content .= "</table>";
     $content .= "<script>";
     $content .= "  jQuery(document).ready(function() {";
 
