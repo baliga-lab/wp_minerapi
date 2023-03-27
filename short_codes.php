@@ -578,6 +578,33 @@ function program_enrichment_summary_pdf_shortcode($attr, $content=null)
     }
 }
 
+
+function mutations_table_shortcode($attr, $content=null)
+{
+    $source_url = get_option('source_url', '');
+    $result_json = file_get_contents($source_url . "/mutations");
+    $entries = json_decode($result_json)->entries;
+    $content = "<table id=\"mutations\">";
+    $content .= "  <thead>";
+    $content .= "    <tr><th>EnsEMBL ID</th><th>Preferred</th><th>Entrez</th><th>Mutation</th></tr>";
+    $content .= "  </thead>";
+    $content .= "  <tbody>";
+    foreach ($entries as $m) {
+        $content .= "    <tr>";
+        $content .= "      <td>$m->ensembl</td><td><a href=\"index.php/gene/?gene=$m->preferred\">$m->preferred</a></td><td>$m->entrez</td><td><a href=\"index.php/mutation/?mutation=$m->mutation\">$m->mutation</a></td>";
+        $content .= "    </tr>";
+    }
+    $content .= "  </tbody>";
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {";
+
+    $content .= "    jQuery('#mutations').DataTable({});";
+    $content .= "  });";
+    $content .= "</script>";
+    return $content;
+}
+
+
 function minerapi_add_shortcodes()
 {
     add_shortcode('summary', 'summary_shortcode');
@@ -606,6 +633,11 @@ function minerapi_add_shortcodes()
 
     // Drug related short codes
     add_shortcode('drug_info', 'drug_info_shortcode');
+
+
+    // Lists
+    add_shortcode('mutations_table', 'mutations_table_shortcode');
+
 
     // Search related short codes
     add_shortcode('minerapi_search_box', 'search_box_shortcode');
