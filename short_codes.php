@@ -653,6 +653,32 @@ function regulons_table_shortcode($attr, $content=null)
     return $content;
 }
 
+function programs_table_shortcode($attr, $content=null)
+{
+    $source_url = get_option('source_url', '');
+    $result_json = file_get_contents($source_url . "/programs");
+    $entries = json_decode($result_json)->entries;
+    $content = "<table id=\"programs\">";
+    $content .= "  <thead>";
+    $content .= "    <tr><th>Program</th><th># regulons</th><th># genes</th></tr>";
+    $content .= "  </thead>";
+    $content .= "  <tbody>";
+    foreach ($entries as $p) {
+        $content .= "    <tr>";
+        $content .= "      <td><a href=\"index.php/program/?program=$p->program\">$p->program</a></td><td>$p->num_regulons</td><td>$p->num_genes</td>";
+        $content .= "    </tr>";
+    }
+    $content .= "  </tbody>";
+    $content .= "</table>";
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {";
+    $content .= "    jQuery('#programs').DataTable({});";
+    $content .= "  });";
+    $content .= "</script>";
+    return $content;
+}
+
+
 function minerapi_add_shortcodes()
 {
     add_shortcode('summary', 'summary_shortcode');
@@ -687,7 +713,7 @@ function minerapi_add_shortcodes()
     add_shortcode('mutations_table', 'mutations_table_shortcode');
     add_shortcode('regulators_table', 'regulators_table_shortcode');
     add_shortcode('regulons_table', 'regulons_table_shortcode');
-
+    add_shortcode('programs_table', 'programs_table_shortcode');
 
     // Search related short codes
     add_shortcode('minerapi_search_box', 'search_box_shortcode');
