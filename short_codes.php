@@ -578,7 +578,6 @@ function program_enrichment_summary_pdf_shortcode($attr, $content=null)
     }
 }
 
-
 function mutations_table_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
@@ -605,6 +604,31 @@ function mutations_table_shortcode($attr, $content=null)
     return $content;
 }
 
+function regulators_table_shortcode($attr, $content=null)
+{
+    $source_url = get_option('source_url', '');
+    $result_json = file_get_contents($source_url . "/regulators");
+    $entries = json_decode($result_json)->entries;
+    $content = "<table id=\"regulators\">";
+    $content .= "  <thead>";
+    $content .= "    <tr><th>EnsEMBL ID</th><th>Preferred</th><th>Entrez</th></tr>";
+    $content .= "  </thead>";
+    $content .= "  <tbody>";
+    foreach ($entries as $m) {
+        $content .= "    <tr>";
+        $content .= "      <td>$m->ensembl</td><td><a href=\"index.php/gene/?gene=$m->preferred\">$m->preferred</a></td><td>$m->entrez</td>";
+        $content .= "    </tr>";
+    }
+    $content .= "  </tbody>";
+    $content .= "</table>";
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {";
+
+    $content .= "    jQuery('#regulators').DataTable({});";
+    $content .= "  });";
+    $content .= "</script>";
+    return $content;
+}
 
 function minerapi_add_shortcodes()
 {
@@ -638,6 +662,7 @@ function minerapi_add_shortcodes()
 
     // Lists
     add_shortcode('mutations_table', 'mutations_table_shortcode');
+    add_shortcode('regulators_table', 'regulators_table_shortcode');
 
 
     // Search related short codes
