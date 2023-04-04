@@ -362,6 +362,33 @@ function gene_uniprot_shortcode($attr, $content=null)
     return $content;
 }
 
+function gene_regulons_shortcode($attr, $content=null)
+{
+    $source_url = get_option('source_url', '');
+    $gene_name = get_query_var('gene');
+    $result_json = file_get_contents($source_url . "/gene_regulons/" . rawurlencode($gene_name));
+    $entries = json_decode($result_json)->entries;
+    $content = "<table id=\"regulons\">";
+    $content .= "  <thead>";
+    $content .= "    <tr><th>Regulon</th><th>Program</th><th># genes</th><th># regulators</th><th># causal flows</th></tr>";
+    $content .= "  </thead>";
+    $content .= "  <tbody>";
+    foreach ($entries as $r) {
+        $content .= "    <tr>";
+        $content .= "      <td><a href=\"index.php/regulon/?regulon=$r->regulon\">$r->regulon</a></td><td><a href=\"index.php/program/?program=$r->program\">$r->program</a></td><td>$r->num_genes</td><td>$r->num_regulators</td><td>$r->num_causalflows</td>";
+        $content .= "    </tr>";
+    }
+    $content .= "  </tbody>";
+    $content .= "</table>";
+    $content .= "<script>";
+    $content .= "  jQuery(document).ready(function() {";
+    $content .= "    jQuery('#regulons').DataTable({});";
+    $content .= "  });";
+    $content .= "</script>";
+    return $content;
+}
+
+
 function regulon_summary_shortcode($attr, $content)
 {
     $regulon_name = get_query_var('regulon');
@@ -704,6 +731,7 @@ function minerapi_add_shortcodes()
     // Gene related short codes
     add_shortcode('gene_info', 'gene_info_shortcode');
     add_shortcode('gene_uniprot', 'gene_uniprot_shortcode');
+    add_shortcode('gene_regulons', 'gene_regulons_shortcode');
 
     // Drug related short codes
     add_shortcode('drug_info', 'drug_info_shortcode');
