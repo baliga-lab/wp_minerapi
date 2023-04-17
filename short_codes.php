@@ -126,12 +126,15 @@ function render_causalflows_table($result_json, $table_id, $title)
         $num_regulon_drugs = count($e->regulon_drugs);
 
         $num_total_drugs = $num_regulon_drugs + $num_regulator_drugs;
+        /* Regulator link fallback */
+        $regulator_id = $e->regulator;
+        if (!$e->regulator) $regulator_id = $e->regulator_preferred;
 
         $content .= "    <tr><td>" . $e->cmf_id .
 		 "</td><td><a href=\"index.php/mutation/?mutation=" .
 		 $e->mutation . "\">" . $mutation . "</a></td><td>" .
 		 $e->mutation_role . "</td><td>" .
-		 "<a href=\"index.php/regulator/?regulator=" . $e->regulator . "\">" .
+		 "<a href=\"index.php/regulator/?regulator=" . $regulator_id . "\">" .
 		 $e->regulator_preferred . "</a></td><td>" .
 		 $e->regulator_role . "</td><td>" .
          "<a href=\"index.php/regulon/?regulon=" . $e->regulon . "\">" .
