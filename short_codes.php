@@ -188,7 +188,7 @@ function program_causalflows_shortcode($attr, $content=null)
     $result_json = file_get_contents($source_url . "/causalflows_for_program/" .
                                      rawurlencode($program));
     return render_causalflows_table($result_json, "program_cmf",
-                                    "Causal Mechanistic Flows with Program <b>$program</b>");
+                                    "Causal Mechanistic Flows with Program <b>" . rename_program($program) . "</b>");
 }
 
 function mutation_causalflows_shortcode($attr, $content=null)
@@ -477,7 +477,7 @@ function program_regulon_table_shortcode($attr, $content=null)
     $result_json = file_get_contents($source_url . "/program/" . $program);
     $regulons = json_decode($result_json)->regulons;
     $content = "";
-    $content .= "<h3>Regulons in program <b>" . $program . "</b></h3>";
+    $content .= "<h3>Regulons in program <b>" . rename_program($program) . "</b></h3>";
     $content .= "<table id=\"prog_regulons\" class=\"stripe row-border\">";
     $content .= "  <thead><tr><th>Regulon</th>";
     $content .= "  <th>Cox Hazard Ratio</th>";
@@ -510,7 +510,7 @@ function program_gene_table_shortcode($attr, $content=null)
     $result_json = file_get_contents($source_url . "/program/" . $program);
     $genes = json_decode($result_json)->genes;
     $content = "";
-    $content .= "<h3>Genes in program <b>" . $program . "</b></h3>";
+    $content .= "<h3>Genes in program <b>" . rename_program($program) . "</b></h3>";
     $content .= "<table id=\"prog_genes\" class=\"stripe row-border\">";
     $content .= "  <thead><tr><th>EnsEMBL Id</th><th>Entrez Id</th><th>Preferred</th></tr></thead>";
     $content .= "  <tbody>";
@@ -553,11 +553,11 @@ function program_info_shortcode($attr, $content=null)
         array_push($regulon_links, "<a href=\"index.php/regulon/?regulon=$regulon\">$regulon</a>");
     }
     $regulons = implode(", ", $regulon_links);
-    $content = "<h3><a href=\"#mutation_table\" data-toggle=\"collapse\" aria-expanded=\"false\" aria-controls=\"help\"><i class=\"fas fa-info-circle pull-right\"> $program</i> </a></h3>\n";
+    $content = "<h3><a href=\"#mutation_table\" data-toggle=\"collapse\" aria-expanded=\"false\" aria-controls=\"help\"><i class=\"fas fa-info-circle pull-right\"> " .  rename_program($program) . "</i> </a></h3>\n";
     $content .= "<div class=\"collapse\" id=\"mutation_table\">\n";
     $content .= "<div class=\"card card-body\">\n";
     $content .= "<div class=\"card-header\">\n";
-    $content .= "<h2><a href=\"/program/?program=$program\">Program $program</a></h2>\n";
+    $content .= "<h2><a href=\"/program/?program=$program\">Program " . rename_program($program) . "</a></h2>\n";
     $content .= "</div>\n";
     $content .= "<p class=\"card-text\"><h4>Genes ($num_genes)</h4>\n";
     $content .= "$genes";
