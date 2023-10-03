@@ -365,6 +365,11 @@ function gene_uniprot_shortcode($attr, $content=null)
     return $content;
 }
 
+function rename_program(prog)
+{
+    return str_replace("P-", "Pr-", prog);
+}
+
 function gene_regulons_shortcode($attr, $content=null)
 {
     $source_url = get_option('source_url', '');
@@ -412,7 +417,7 @@ function regulon_summary_shortcode($attr, $content)
     $content .= "<table id=\"summary1\" class=\"row-border\" style=\"margin-bottom: 10px\">";
     $content .= "  <thead><tr><th>Genes</th><th>Cox Hazard Ratio</th><th>Regulators</th><th>Causal Flows</th><th>Transcriptional Programs</th><th>Hallmarks</th></tr></thead>";
     $content .= "  <tbody>";
-    $content .= "    <tr><td><a href=\"#genes\">$num_genes</a></td><td>$result->hazard_ratio</td><td><a href=\"#regulators\">$num_regulators</a></td><td>$result->num_causal_flows</td><td><a href=\"index.php/program/?program=" . $result->program . "\">" . $result->program . "</a></td><td>$hallmarks</td></tr>";
+    $content .= "    <tr><td><a href=\"#genes\">$num_genes</a></td><td>$result->hazard_ratio</td><td><a href=\"#regulators\">$num_regulators</a></td><td>$result->num_causal_flows</td><td><a href=\"index.php/program/?program=" . rename_program($result->program) . "\">" . $result->program . "</a></td><td>$hallmarks</td></tr>";
     $content .= "  </tbody>";
     $content .= "</table>";
 
