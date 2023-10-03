@@ -365,9 +365,9 @@ function gene_uniprot_shortcode($attr, $content=null)
     return $content;
 }
 
-function rename_program(prog)
+function rename_program($prog)
 {
-    return str_replace("P-", "Pr-", prog);
+    return str_replace("P-", "Pr-", $prog);
 }
 
 function gene_regulons_shortcode($attr, $content=null)
